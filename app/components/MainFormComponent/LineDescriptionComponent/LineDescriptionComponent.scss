@@ -1,0 +1,17 @@
+@import "../../../static/constants.scss";
+
+.description{
+  height: $ValveLineHeight;
+  margin-top: $ValveLineMargin;
+  display: flex;
+  align-items: center;
+  position: relative;
+  .sign{
+    cursor: pointer;
+    padding: 0 3px;
+    font-weight: 700;
+    font-size: 1.5rem;
+    z-index: 100;
+    background-color: white;
+  }
+}

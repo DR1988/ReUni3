@@ -1,0 +1,57 @@
+$waitShowWidth: 10px;
+$waitShowWidthIncrease: 15px;
+.time-former {
+  position: relative;
+  display: inline-block;
+  height: 90%;
+  .time{
+    display: inline-block;
+    height: 100%;
+    background-color: rgba(171, 193, 197, 0.55);
+    .time-container{
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center
+    }
+    span {
+      text-overflow:ellipsis;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: rgba(129, 172, 188, 1);
+    }
+
+  }
+  .gap {
+    vertical-align: top;
+    height: 100%;
+    display: inline-block;
+  }
+
+  .waitShow {
+    position: absolute;
+    bottom: 100%;
+    width: 0; 
+    height: 0; 
+    left: -$waitShowWidth;
+   
+    border-left: $waitShowWidth solid transparent;
+    border-right: $waitShowWidth solid transparent;
+    border-top: $waitShowWidth solid #f00;
+    animation-name: waitShow;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+  }
+
+  @keyframes waitShow {
+    0% {bottom: 100%}
+    50% {bottom: 150%;
+      border-left-width: $waitShowWidthIncrease;
+      border-right-width: $waitShowWidthIncrease;
+      border-top-width: $waitShowWidthIncrease;
+      left: -$waitShowWidthIncrease}
+    100% {bottom: 100%}
+
+  }
+}

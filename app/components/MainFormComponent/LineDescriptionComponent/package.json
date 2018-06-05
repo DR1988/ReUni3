@@ -1,0 +1,6 @@
+{
+  "name": "LineDescriptionComponent",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./LineDescriptionComponent.jsx"
+}

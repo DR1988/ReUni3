@@ -1,0 +1,40 @@
+@import "../../../static/constants.scss";
+
+.time-box_keeper{
+  position: relative;
+  width: 100%;
+  background-color: rgba(209, 216, 209, 0.5);
+  display: flex;
+  height: $ValveLineHeight;
+  margin-top: $ValveLineMargin;
+  align-items: center;
+  & .time-box {
+    // position: relative;
+    // top: 25%;
+    height: 90%;
+  }
+}
+
+.timeFormer{
+  height: 100%;
+  // background-color: rgba(171, 193, 197, 0.55);
+  background: radial-gradient(
+    closest-side,
+    rgba(171, 193, 197, 0.8) 80%,
+    rgba(171, 193, 197, 1)
+  );
+  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.timeFormer_sign{
+  color: #81acbc;
+  font-size: 2rem;
+  font-weight: 700;
+}
+.gap{
+  height: 100%;
+  display: inline-block;
+}

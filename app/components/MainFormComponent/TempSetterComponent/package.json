@@ -1,0 +1,6 @@
+{
+  "name": "TempSetterComponent",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./TempSetterComponent.jsx"
+}
