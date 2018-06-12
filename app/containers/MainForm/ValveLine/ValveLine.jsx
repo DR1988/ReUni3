@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
 
 class ValveLine extends Component {
   static propTypes = {
@@ -12,7 +11,6 @@ class ValveLine extends Component {
   }
 }
 
-const mapStateToProps = state => ({ mainForm: state.mainFormReducer })
 
 
-export default connect(mapStateToProps)(ValveLine)
+export default ValveLine

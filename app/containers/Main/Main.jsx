@@ -1,11 +1,9 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles'
 import purple from 'material-ui/colors/purple'
 
 import MainComponent from '../../components/MainComponent'
-import { actions } from './mainRedux'
 
 // import Button from 'material-ui/Button';
 const theme = createMuiTheme({
@@ -56,8 +54,6 @@ Main.propTypes = {
   currentForm: PropTypes.string.isRequired,
 }
 
-const mapStateToProps = state => ({
-  currentForm: state.mainReducer.currentForm,
-})
 
-export default connect(mapStateToProps, actions)(Main)
+
+export default Main

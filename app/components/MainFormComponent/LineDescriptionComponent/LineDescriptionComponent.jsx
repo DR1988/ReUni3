@@ -44,10 +44,10 @@ class LineDescriptionComponent extends Component {
               className={s.sign}
               onClick={() => this.showElem(elem, this.transitionRight)}
             >
-              {elem.ShortName}
+              {elem.shortName}
             </p>
             <LineDescription
-              valve={elem.ShortName}
+              valve={elem.shortName}
               currenrtElem={this.state.elem}
               transition={this.state.transition}
               handleClose={this.hideElem}

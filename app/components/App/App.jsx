@@ -12,7 +12,7 @@ const App = ({ store }) => (
 )
 
 App.propTypes = {
-  store: PropTypes.object.isRequired, //eslint-disable-line react/forbid-prop-types
+  store: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
 }
 
 export default App

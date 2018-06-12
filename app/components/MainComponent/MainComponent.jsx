@@ -1,6 +1,5 @@
 // @flow
 import React, { Component, Fragment } from 'react'
-import PropTypes from 'prop-types'
 import cn from 'classnames'
 
 import s from './MainComponent.scss'
@@ -9,10 +8,16 @@ import Graphs from '../../containers/Graphs'
 import FormChoserComponent from './FormChoserComponent'
 
 type State = {
-  current: string,
+  currentForm: string,
 }
 
-const AppForms = ({ currentForm }) => (
+type Props = {}
+
+type AppFormsProps = {
+  currentForm: string,
+}
+
+const AppForms = ({ currentForm }: AppFormsProps) => (
   <Fragment>
     <div
       className={
@@ -32,14 +37,14 @@ const AppForms = ({ currentForm }) => (
 )
 
 class MainComponent extends Component<Props, State> {
-  constructor(props:Props) {
+  constructor(props: Props) {
     super(props)
     this.state = {
       currentForm: 'MainForm',
     }
   }
 
-  updateForm = (currentForm) => {
+  updateForm = (currentForm: string) => {
     this.setState({
       currentForm,
     })
@@ -56,11 +61,6 @@ class MainComponent extends Component<Props, State> {
       </div>
     )
   }
-}
-
-MainComponent.propTypes = {
-  currentForm: PropTypes.string.isRequired,
-  updateForm: PropTypes.func.isRequired,
 }
 
 export default MainComponent

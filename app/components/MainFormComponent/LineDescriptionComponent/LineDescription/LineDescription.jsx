@@ -26,7 +26,7 @@ const LineDecription = ({ valve, currenrtElem, transition, handleClose }) => {
     }
   }
   return (
-    valve === currenrtElem.ShortName ?
+    valve === currenrtElem.shortName ?
       <Snackbar
         open={!!descrioptionShow(valve)}
         message={descrioptionShow(valve)}

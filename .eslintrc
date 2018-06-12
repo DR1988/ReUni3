@@ -36,7 +36,7 @@
     "react/jsx-filename-extension": [0],
     "import/no-named-as-default": [0],
     "linebreak-style": [0],
-    "jsx-a11y/anchor-is-valid": [ "error", {
+    "jsx-a11y/anchor-is-valid": [ 0, {
       "components": [ "Link" ],
       "specialLink": [ "to" ]
     }]
