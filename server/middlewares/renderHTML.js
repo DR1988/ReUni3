@@ -33,8 +33,6 @@ router.get('*', (req, res) => {
   let styles = []
   if (process.env.NODE_ENV === 'development') {
     [
-      './../../app/redux/confStore',
-      './../../app/saga/rootsaga',
       './../../app/components/HTML/HTML',
     ].forEach(purgeCache)
 
@@ -47,21 +45,16 @@ router.get('*', (req, res) => {
     styles = ['styles.css']
   }
     /* eslint-disable global-require */
-  const configureStore = require('./../../app/redux/confStore.js').default
-  const rootSaga = require('./../../app/saga/rootsaga.js').default
   const Html = require('./../../app/components/HTML/HTML').default
   // const routes = require('../../app/routes').default
   // const Html = require('../../app/components/Html').default
   /* eslint-enable global-require */
   // const mainChunk = res.locals.webpackStats.toJson().assetsByChunkName.main
 
-  const store = configureStore()
-  store.runSaga(rootSaga)
-  const state = store.getState()
   const inlineCss = global.inlineCss
   const componentHTML = renderToStaticMarkup(
-    <Html initialState={state} scripts={scripts} styles={styles} inlineStyles={inlineCss}>
-      <App store={store} />
+    <Html scripts={scripts} styles={styles} inlineStyles={inlineCss}>
+      <App />
     </Html>,
   )
   return res.send(`<!doctype html>${componentHTML}`)

@@ -18,7 +18,7 @@ const Html = ({ children, initialState = {}, /* scripts,*/ styles, inlineStyles 
       />
     </head>
     <body>
-      <div id="root">{children}</div>
+      <div style={{ height: '100%' }} id="root">{children}</div>
       {/* {scripts.map(s => <script key={s} src={`/${s}`} />)}*/}
       <script type="application/javascript" src="/build.js" />
       {inlineStyles ? (

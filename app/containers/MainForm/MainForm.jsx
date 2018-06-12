@@ -203,8 +203,10 @@ class MainForm extends Component<Props, State> {
     >
       <MainFormComponent
         resetState={this.resetState}
+        showModal={this.showModal}
         {...this.state}
       />
+      
     </div>
     )
   }

@@ -1,11 +1,9 @@
 // @flow
-import React, { Component, Fragment } from 'react'
-import cn from 'classnames'
+import React, { Component } from 'react'
 
 import s from './MainComponent.scss'
-import MainForm from '../../containers/MainForm'
-import Graphs from '../../containers/Graphs'
 import FormChoserComponent from './FormChoserComponent'
+import AppForms from './AppForms'
 
 type State = {
   currentForm: string,
@@ -16,25 +14,6 @@ type Props = {}
 type AppFormsProps = {
   currentForm: string,
 }
-
-const AppForms = ({ currentForm }: AppFormsProps) => (
-  <Fragment>
-    <div
-      className={
-        cn({ [s.show]: currentForm === 'MainForm' },
-           { [s.hide]: currentForm !== 'MainForm' })}
-    >
-      <MainForm />
-    </div>
-    <div
-      className={
-        cn({ [s.show]: currentForm === 'Graphs' },
-           { [s.hide]: currentForm !== 'Graphs' })}
-    >
-      <Graphs />
-    </div>
-  </Fragment>
-)
 
 class MainComponent extends Component<Props, State> {
   constructor(props: Props) {

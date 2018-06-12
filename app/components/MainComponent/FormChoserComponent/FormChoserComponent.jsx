@@ -4,7 +4,7 @@ import s from './FormChoserComponent.scss'
 import PropTypes from 'prop-types'
 
 type Props = {
-  updateForm: (s:string) => void,
+  updateForm: (s: string) => void,
   form?: string
 }
 
@@ -21,7 +21,7 @@ class Button extends Component<ButtonProps> {
     const { form, updateForm } = this.props
     updateForm(form)
   }
-  render(){
+  render() {
     const { form } = this.props
     return (
       <button onClick={this.updateForm}>{form}</button>
