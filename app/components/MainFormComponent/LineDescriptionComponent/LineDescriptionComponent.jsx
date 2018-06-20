@@ -33,12 +33,12 @@ class LineDescriptionComponent extends Component {
   }
 
   render() {
-    const { lineFormer } = this.props
+    const { lines } = this.props
     return (
       <aside
         className={s.root}
       >
-        {lineFormer.map(elem => {
+        {lines.map(elem => {
           return (<div className={s.description} key={elem.id}>
             <p
               className={s.sign}

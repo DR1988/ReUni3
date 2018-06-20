@@ -30,8 +30,4 @@ const AppForms = ({ currentForm }: Props) => (
   </Fragment>
 )
 
-AppForms.propTypes = {
-
-}
-
 export default AppForms

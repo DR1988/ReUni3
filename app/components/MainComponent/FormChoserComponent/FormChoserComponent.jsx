@@ -13,7 +13,7 @@ type ButtonProps = {
   form: string
 }
 class Button extends Component<ButtonProps> {
-  constructor(props:ButtonProps){
+  constructor(props:ButtonProps) {
     super(props)
   }
 

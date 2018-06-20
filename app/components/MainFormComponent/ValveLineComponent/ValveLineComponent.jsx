@@ -1,43 +1,53 @@
 // @flow
-import React from 'react'
+import React, { Component } from 'react'
 
 import s from './ValveLineComponent.scss'
 import type { ValveLineType } from '../../../containers/MainForm/MainFormTypes'
+import ValveTimeComponent from './ValveTimeComponent'
 
 type Props = {
   line: ValveLineType,
   allTime: number,
+  showModal: () => void,
+  setChosenValveTime: () => void
 }
-const ValveLineComponent = (props: Props) => (
-  <div
-    className={s['time-box_keeper']}
-    onClick={() => console.log(222)}
-  >
-    {props.line.changes.map((el) => {
-      const { gapTime, duration } = el
-      const width = 100 * ((duration + gapTime) / props.allTime)
-      return (
-        <div
-          key={el.id}
-          className={s['time-box']}
-          style={{
-            width: `${width}%`,
-          }}
-        >
-          <div
-            className={s.timeFormer}
-            onClick={(e) => { e.stopPropagation(); console.log(1123) }}
-            style={{
-              width: `${100 * (duration / width)}%`,
-            }}
-          >
-            <span className={s.timeFormer_sign}>
-              {duration}
-            </span>
-          </div>
-        </div>)
-    })}
-  </div >
-)
+
+class ValveLineComponent extends Component<Props> {
+  constructor(props: Props) { // eslint-disable-line
+    super(props)
+  }
+
+  render() {
+    const { showModal, setChosenValveTime, allTime, line } = this.props
+    return (
+      <div
+        className={s['time-box_keeper']}
+      >
+        {line.changes.map((el, ind) => {
+          const { gapTime, duration, startTime } = el
+          const width = 100 * ((duration + gapTime) / allTime)
+          return (
+            <div
+              key={el.changeId}
+              className={s['time-box']}
+              style={{
+                marginLeft: ind === 0 ? `${100 * startTime/allTime}%` : 0,
+                width: `${width}%`,
+              }}
+            >
+              <ValveTimeComponent
+                lineID={line.id}
+                changeId={el.changeId}
+                duration={duration}
+                width={100 * duration / (duration + gapTime) }
+                showModal={showModal}
+                setChosenValveTime={setChosenValveTime}
+              />
+            </div>)
+        })}
+      </div >
+    )
+  }
+}
 
 export default ValveLineComponent

@@ -1,0 +1,19 @@
+.timeFormer{
+  height: 100%;
+  background: radial-gradient(
+    closest-side,
+    rgba(171, 193, 197, 0.8) 80%,
+    rgba(171, 193, 197, 1)
+  );
+  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+.timeFormer_sign{
+  color: #81acbc;
+  font-size: 2rem;
+  font-weight: 700;
+}

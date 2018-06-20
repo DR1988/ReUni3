@@ -7,26 +7,14 @@ import TimeLine from './TimeLineComponent'
 import NoteComponent from './NoteComponent'
 import ReactionFlowComponent from './ReactionFlowComponent'
 import ValveLineComponent from './ValveLineComponent'
-
-type ValveLine = {
-  name: 'ValveLine' | 'RPMSetter' | 'TempSetter',
-  id: number,
-  shortName: string,
-  changes: Array<{
-    startTime: number,
-    endTime: number,
-    id: number,
-    duration: number,
-    gapTime: number,
-    waitForValue?: boolean,
-  }>
-}
+import type { ValveLineType } from '../../containers/MainForm/MainFormTypes'
+import ValveTimeComponentAdder from './ValveTimeComponentAdder'
 
 type Props = {
   distance: number,
   time: number,
   showEditModal: boolean,
-  lineFormer: Array<ValveLine>,
+  lineFormer: Array<ValveLineType>,
 }
 
 type State = {}
@@ -45,9 +33,11 @@ class MainFormComponent extends Component<Props, State> {
       allTime,
       showModal,
       closeModal,
-      resetState
+      resetState,
+      addNewValveTime,
+      setChosenValveTime,
     } = this.props
-    // console.log(lineFormer[0].changes[1])
+    // console.log(lineFormer[0].changes[1]
     return (
       <div id="mainForm" className={s.mainForm}>
         <section className={s.sidebar}>
@@ -55,7 +45,7 @@ class MainFormComponent extends Component<Props, State> {
           <ReactionFlowComponent />
         </section>
         <section className={s['form-container']}>
-          <LineDescriptionComponent lineFormer={lineFormer} />
+          <LineDescriptionComponent lines={lineFormer} />
           <section className={s['lines-keeper']}>
             {lineFormer.map(elem => <ValveLineComponent
               key={elem.id}
@@ -63,6 +53,8 @@ class MainFormComponent extends Component<Props, State> {
               allTime={allTime}
               showModal={showModal}
               closeModal={closeModal}
+              addNewValveTime={addNewValveTime}
+              setChosenValveTime={setChosenValveTime}
             />,
             )}
             <TimeLine
@@ -74,6 +66,11 @@ class MainFormComponent extends Component<Props, State> {
               <button onClick={resetState} >Reset</button>
             </div>
           </section>
+          <ValveTimeComponentAdder
+            lines={lineFormer}
+            showModal={showModal}
+            addNewValveTime={addNewValveTime}
+          />
         </section>
       </div>
     )

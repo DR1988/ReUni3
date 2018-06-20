@@ -24,9 +24,11 @@ class MainComponent extends Component<Props, State> {
   }
 
   updateForm = (currentForm: string) => {
-    this.setState({
-      currentForm,
-    })
+    if (currentForm !== this.state.currentForm) {
+      this.setState({
+        currentForm,
+      })
+    }
   }
 
   render() {
