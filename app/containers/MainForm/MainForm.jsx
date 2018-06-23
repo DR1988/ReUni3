@@ -4,7 +4,7 @@ import React, { Component } from 'react' // eslint-disable-line
 import cloneDeep from 'lodash/cloneDeep'
 
 import MainFormComponent from '../../components/MainFormComponent'
-import type { State, ValveLineType, ChosenElement } from './MainFormTypes'
+import type { State, ValveLineType, ChosenElement, LineFormer } from './MainFormTypes'
 import Modal from '../../components/Modal'
 import ValveLineModal from '../../components/Modal/ValveLineModal'
 import { withCondition } from '../../components/HOC'
@@ -21,6 +21,7 @@ class MainForm extends Component<Props, State> {
     super(props)
     this.initialState = {
       chosenElement: {
+        wrongValue: '',
         chosenLine: {
           name: 'ValveLine',
           id: 0,
@@ -121,6 +122,7 @@ class MainForm extends Component<Props, State> {
       previousChanges: [{ startTime: 0, endTime: 20, changeId: 0, duration: 20, gapTime: 0 }],
       newElement: false,
       changeId: 0,
+      wrongValue: '',
     },
     distance: 0,
     time: 0,
@@ -133,7 +135,8 @@ class MainForm extends Component<Props, State> {
         shortName: 'GV1',
         changes: [
           { startTime: 0, endTime: 10, changeId: 0, duration: 10, gapTime: 10 },
-          { startTime: 20, endTime: 40, changeId: 1, duration: 20, gapTime: 0 },
+          { startTime: 20, endTime: 80, changeId: 1, duration: 60, gapTime: 0 },
+          { startTime: 120, endTime: 240, changeId: 2, duration: 120, gapTime: 0 },
         ],
       },
       {
@@ -281,27 +284,32 @@ class MainForm extends Component<Props, State> {
     const { changeId, chosenLine } = chosenElement
 
     const startTime = lineFormer[chosenLine.id].changes[changeId].startTime
+    if (value <= startTime) {
+      this.setState({
+        ...this.state,
+        chosenElement: {
+          ...this.state.chosenElement,
+          wrongValue: 'end time should be greater than start time',
+        },
+      })
+      return
+    }
     const newlineFormer = cloneDeep(lineFormer)
-    newlineFormer[chosenLine.id].changes[changeId].duration = value
-    const endTime = startTime + value
-    newlineFormer[chosenLine.id].changes[changeId].endTime = endTime
+    newlineFormer[chosenLine.id].changes[changeId].endTime = value
 
     const newChosenLine: ValveLineType = cloneDeep(chosenLine)
-    newChosenLine.changes[changeId].endTime = endTime
-    newChosenLine.changes[changeId].duration = value
+    newChosenLine.changes[changeId].endTime = value
 
     const maxTime = Math.max(...newlineFormer.map(lines => lines.changes[lines.changes.length - 1].endTime))
-    const allTime = endTime > maxTime ? endTime : maxTime
+    const allTime = value > maxTime ? value : maxTime
 
-    // newlineFormer[chosenLine.id].changes[changeId].startTime = 333333
-    // console.log('lineFormer', lineFormer[chosenLine.id].changes[changeId])
-    console.log('newChosenLine', newChosenLine)
     this.setState({
       ...this.state,
       lineFormer: newlineFormer,
       allTime,
       chosenElement: {
         ...this.state.chosenElement,
+        wrongValue: '',
         chosenLine: newChosenLine,
       },
     })
@@ -309,12 +317,45 @@ class MainForm extends Component<Props, State> {
 
   changeStartTime = (value: number): void => {
     const { chosenElement, lineFormer } = this.state
-    // console.log('chosenElement', chosenElement)
     const { changeId, chosenLine } = chosenElement
-    lineFormer[chosenLine.id].changes[changeId].startTime = value
+
+    const endTime = lineFormer[chosenLine.id].changes[changeId].endTime
+    if (value >= endTime) {
+      this.setState({
+        ...this.state,
+        chosenElement: {
+          ...this.state.chosenElement,
+          wrongValue: 'start time should be less than end time',
+        },
+      })
+      return
+    }
+    const newlineFormer = cloneDeep(lineFormer)
+    newlineFormer[chosenLine.id].changes[changeId].startTime = value
+    newlineFormer[chosenLine.id].changes[changeId].duration = endTime - value
+    const newChosenLine: ValveLineType = cloneDeep(chosenLine)
+    newChosenLine.changes[changeId].startTime = value
+    newChosenLine.changes[changeId].duration = endTime - value
+    // console.log(newChosenLine.changes[changeId - 1].endTime)
+    if (newChosenLine.changes[changeId - 1].endTime >= value) {
+      console.log('increase')
+      newlineFormer[chosenLine.id].changes[changeId - 1].endTime = newChosenLine.changes[changeId].endTime
+      newlineFormer[chosenLine.id].changes[changeId - 1].duration = newChosenLine.changes[changeId - 1].endTime - newChosenLine.changes[changeId - 1].startTime
+    } else if (chosenLine.changes[changeId - 1].endTime < value) {
+      console.log('return')
+      newlineFormer[chosenLine.id].changes[changeId - 1].endTime = chosenLine.changes[changeId - 1].endTime
+      newlineFormer[chosenLine.id].changes[changeId - 1].duration = chosenLine.changes[changeId - 1].endTime - chosenLine.changes[changeId - 1].startTime
+    }
+    // console.log('chosenElement', newlineFormer)
+
     this.setState({
       ...this.state,
-      lineFormer,
+      lineFormer: newlineFormer,
+      chosenElement: {
+        ...this.state.chosenElement,
+        wrongValue: '',
+        chosenLine: newChosenLine,
+      },
     })
   }
 
@@ -330,8 +371,6 @@ class MainForm extends Component<Props, State> {
   render() {
     const { chosenElement, lineFormer } = this.state
     const { changeId, chosenLine } = chosenElement
-    console.log('lineFormer', lineFormer[chosenLine.id].changes[changeId])
-    console.log('chosenElement', chosenElement)
     return (<div
       id="form-Manupalation"
     >

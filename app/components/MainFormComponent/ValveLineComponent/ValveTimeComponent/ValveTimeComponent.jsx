@@ -6,10 +6,11 @@ import s from './ValveTimeComponent.scss'
 type Props = {
   changeId: number,
   duration: number,
+  startTime: number,
   width: number,
   lineID: number,
   showModal: () => void,
-  setChosenValveTime: (lineID: number, changeId: number) => void,
+  onClick: (lineID: number, changeId: number) => void,
 }
 
 class ValveTimeComponent extends Component<Props> {
@@ -18,19 +19,20 @@ class ValveTimeComponent extends Component<Props> {
   }
   toggleValveTime = (e: Event) => {
     e.stopPropagation()
-    const { changeId, showModal, setChosenValveTime, lineID } = this.props
+    const { changeId, showModal, onClick, lineID } = this.props
     showModal()
-    setChosenValveTime(lineID, changeId)
+    onClick(lineID, changeId)
   }
 
   render() {
-    const { duration, width } = this.props
+    const { duration, width, startTime } = this.props
     return (
       <div
         className={s.timeFormer}
         onClick={this.toggleValveTime}
         style={{
-          width: `${width}%`,
+          left: `${100 * startTime}%`,
+          width: `${100 * width}%`,
         }}
       >
         <span className={s.timeFormer_sign}>

@@ -10,5 +10,6 @@
   align-items: center;
   & .time-box {
     height: 90%;
+    transition: all 0.5s linear;
   }
 }

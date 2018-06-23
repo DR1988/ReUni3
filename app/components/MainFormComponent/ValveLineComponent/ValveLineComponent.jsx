@@ -24,26 +24,30 @@ class ValveLineComponent extends Component<Props> {
         className={s['time-box_keeper']}
       >
         {line.changes.map((el, ind) => {
-          const { gapTime, duration, startTime } = el
-          const width = 100 * ((duration + gapTime) / allTime)
+          const { gapTime, startTime, endTime } = el
+          const duration = endTime - startTime
+          // const width = 100 * ((duration + gapTime) / allTime)
           return (
-            <div
-              key={el.changeId}
-              className={s['time-box']}
-              style={{
-                marginLeft: ind === 0 ? `${100 * startTime/allTime}%` : 0,
-                width: `${width}%`,
-              }}
-            >
+            // <div
+            //   key={el.changeId}
+            //   className={s['time-box']}
+            //   style={{
+            //     marginLeft: ind === 0 ? `${100 * startTime/allTime}%` : 0,
+            //     width: `${width}%`,
+            //   }}
+            // >
               <ValveTimeComponent
+                key={el.changeId}
                 lineID={line.id}
                 changeId={el.changeId}
                 duration={duration}
-                width={100 * duration / (duration + gapTime) }
+                startTime={startTime / allTime}
+                width={duration / allTime}
                 showModal={showModal}
-                setChosenValveTime={setChosenValveTime}
+                onClick={setChosenValveTime}
               />
-            </div>)
+            // </div>
+          )
         })}
       </div >
     )

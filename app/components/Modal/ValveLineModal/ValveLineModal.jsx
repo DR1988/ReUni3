@@ -67,7 +67,7 @@ const ValveLineModal = ({
   changeStartTime,
   resetToPreviousChanges,
 }: Props) => {
-  const { chosenLine, changeId, newElement } = chosenElement
+  const { chosenLine, changeId, newElement, wrongValue } = chosenElement
   return (
     <div className={s.root}>
       <div className={s.content}>
@@ -85,16 +85,20 @@ const ValveLineModal = ({
               />
             </div>
             <div>
-              <label htmlFor="duration">Duration</label>
+              <label htmlFor="end-time">End time</label>
               <br />
               <CustomInput
-                id="duration"
+                id="end-time"
                 changeValue={changeEndTime}
-                value={!newElement ? chosenLine.changes[changeId].duration : 0}
+                value={!newElement ? chosenLine.changes[changeId].endTime : 0}
                 // defaultValue={!newElement ? chosenLine.changes[changeId].endTime : 0}
               />
             </div>
           </div>
+          {wrongValue ?
+            <div>
+              <span>{wrongValue}</span>
+            </div> : null}
           <button onClick={closeModal} >Ok</button>
           {!newElement ?
             <Button

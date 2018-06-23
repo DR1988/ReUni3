@@ -18,9 +18,10 @@ export type LineFormer = Array<ValveLineType>
 
 export type ChosenElement = {
   chosenLine: ValveLineType,
+  previousChanges: Array<Change>,
   changeId: number,
   newElement: boolean,
-  previousChanges: Array<Change>,
+  wrongValue: string,
 }
 
 export type State = {
