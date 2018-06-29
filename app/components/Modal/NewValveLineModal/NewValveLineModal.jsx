@@ -1,15 +1,15 @@
 // @flow
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import cn from 'classnames'
 
-import s from './ValveLineModal.scss'
-import type { ChosenElement } from '../../../containers/MainForm/MainFormTypes'
+import s from './NewValveLineModal.scss'
 
 type Props = {
   closeModal: () => void,
-  removeValveTime: () => void,
   chosenElement: ChosenElement,
-  changeStartTime: (value: number) => void,
+  changeNewStartTime: (value: number) => void,
+  changeNewEndTime: (value: number) => void,
 };
 
 type ButtonProps = {
@@ -60,16 +60,20 @@ class CustomInput extends Component<CustomInputProps> { // eslint-disable-line
     />)
   }
 }
-
-const ValveLineModal = ({
+const NewValveLineModal = ({
   closeModal,
   chosenElement,
-  removeValveTime,
-  changeEndTime,
-  changeStartTime,
   resetToPreviousChanges,
+  changeNewStartTime,
+  changeNewEndTime,
 }: Props) => {
-  const { chosenLine, changeId, wrongSign } = chosenElement
+
+  const isSetValveTimeEnable = (newStartTime: number, newEndTime: number): string => {
+    if (newStartTime >= newEndTime) return 'Start time should be less then End time'
+    return ''
+  }
+  const { chosenLine, wrongSign, newStartTime, newEndTime } = chosenElement
+  // console.log('newStartTime', newStartTime)
   return (
     <div className={s.root}>
       <div className={s.content}>
@@ -81,8 +85,9 @@ const ValveLineModal = ({
               <br />
               <CustomInput
                 id="start-time"
-                changeValue={changeStartTime}
-                value={chosenLine.changes[changeId].startTime}
+                changeValue={changeNewStartTime}
+                value={!isNaN(newStartTime) ? newStartTime : 0}
+              // defaultValue={!newElement ? chosenLine.changes[changeId].startTime : 0}
               />
             </div>
             <div>
@@ -90,24 +95,20 @@ const ValveLineModal = ({
               <br />
               <CustomInput
                 id="end-time"
-                changeValue={changeEndTime}
-                value={chosenLine.changes[changeId].endTime}
+                changeValue={changeNewEndTime}
+                value={!isNaN(newEndTime) ? newEndTime : 0}
+              // defaultValue={!newElement ? chosenLine.changes[changeId].endTime : 0}
               />
             </div>
           </div>
-          {wrongSign ?
+          {isSetValveTimeEnable(newStartTime, newEndTime) ?
             <div>
-              <span>{wrongSign}</span>
+              <span>{isSetValveTimeEnable(newStartTime, newEndTime)}</span>
             </div> : null}
           <button
-            className={cn({ [s.button_disable]: wrongSign })}
+            className={cn({ [s.button_disable]: isSetValveTimeEnable(newStartTime, newEndTime) })}
             onClick={closeModal}
           >Ok</button>
-          <Button
-            removeValveTime={removeValveTime}
-            chosenElement={chosenElement}
-            closeModal={closeModal}
-          />
           <button
             onClick={() => {
               resetToPreviousChanges()
@@ -120,4 +121,4 @@ const ValveLineModal = ({
   )
 }
 
-export default ValveLineModal
+export default NewValveLineModal

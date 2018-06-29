@@ -23,8 +23,8 @@ class ValveLineComponent extends Component<Props> {
       <div
         className={s['time-box_keeper']}
       >
-        {line.changes.map((el, ind) => {
-          const { gapTime, startTime, endTime } = el
+        {line.changes.map((el) => {
+          const { startTime, endTime, crossingValueEnd, crossingValueStart } = el
           const duration = endTime - startTime
           // const width = 100 * ((duration + gapTime) / allTime)
           return (
@@ -45,6 +45,8 @@ class ValveLineComponent extends Component<Props> {
                 width={duration / allTime}
                 showModal={showModal}
                 onClick={setChosenValveTime}
+                crossingValueEnd={crossingValueEnd / duration}
+                crossingValueStart={crossingValueStart / duration}
               />
             // </div>
           )
