@@ -41,6 +41,8 @@ class ValveTimeComponent extends Component<Props> {
       return `linear-gradient(90deg, rgba(171, 193, 197, 1) ${100 + 100 * crossingValueEnd}%, rgba(0, 0, 0, 0) 0),
       rgba(171, 193, 197, 0.5) repeating-linear-gradient(-45deg, transparent, transparent 7.5px,
       rgba(226, 5, 5, 0.5) 7.5px, rgba(226, 5, 5, 0.5) 15px)`
+    } else if (crossingValueEnd === 0) {
+      return 'linear-gradient(90deg, red 3px, rgba(171, 193, 197, 1) 0%)'
     }
 
     return 'rgba(171, 193, 197, 1)'
