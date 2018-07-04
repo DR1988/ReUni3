@@ -2,7 +2,7 @@
 export type Change ={
   startTime: number,
   endTime: number,
-  changeId: : number | string,
+  changeId: number | string,
   duration: number,
   waitForValue?: boolean,
   crossingValueStart: number,
