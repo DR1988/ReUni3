@@ -29,6 +29,7 @@ class ValveTimeComponent extends Component<Props> {
   getCrossingSpace = (
     { crossingValueStart, crossingValueEnd }: { crossingValueStart: number, crossingValueEnd: number },
   ): string => {
+    console.log('crossingValueStart, crossingValueEnd ', crossingValueStart, crossingValueEnd )
     if (crossingValueStart > 0 && crossingValueEnd < 0) {
       return `linear-gradient(90deg, rgba(0, 0, 0, 0) ${100 * crossingValueStart}%, rgba(171, 193, 197, 1) 0%, rgba(171, 193, 197, 1) ${100 + 100 * crossingValueEnd}%, rgba(0, 0, 0, 0) 0),
       rgba(171, 193, 197, 0.5) repeating-linear-gradient(-45deg, transparent, transparent 7.5px,
@@ -41,8 +42,10 @@ class ValveTimeComponent extends Component<Props> {
       return `linear-gradient(90deg, rgba(171, 193, 197, 1) ${100 + 100 * crossingValueEnd}%, rgba(0, 0, 0, 0) 0),
       rgba(171, 193, 197, 0.5) repeating-linear-gradient(-45deg, transparent, transparent 7.5px,
       rgba(226, 5, 5, 0.5) 7.5px, rgba(226, 5, 5, 0.5) 15px)`
-    } else if (crossingValueEnd === 0) {
+    } else if (crossingValueStart === 0) {
       return 'linear-gradient(90deg, red 3px, rgba(171, 193, 197, 1) 0%)'
+    } else if (crossingValueEnd === 0) {
+      return `linear-gradient(90deg, rgba(171, 193, 197, 1) calc(${100}% - 3px), red 3px)`
     }
 
     return 'rgba(171, 193, 197, 1)'

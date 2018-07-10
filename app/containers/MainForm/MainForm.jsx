@@ -555,7 +555,7 @@ class MainForm extends Component<Props, State> {
     if (newChosenLine.changes[currentItemIndex - 1].endTime >= newStartTime) {
       newlineFormer[chosenLine.id].changes[currentItemIndex].crossingValueStart = newChosenLine.changes[currentItemIndex - 1].endTime - newStartTime
       newChosenLine.changes[currentItemIndex].crossingValueStart = newChosenLine.changes[currentItemIndex - 1].endTime - newStartTime
-      wrongSign = 'your changed value crossing next valve open time'
+      wrongSign = 'your changed value crossing previous valve closing time'
     } else if (newChosenLine.changes[currentItemIndex - 1].endTime < newStartTime) {
       newChosenLine.changes[currentItemIndex].crossingValueStart = NaN
       newlineFormer[chosenLine.id].changes[currentItemIndex].crossingValueStart = NaN
@@ -571,21 +571,12 @@ class MainForm extends Component<Props, State> {
         newStartTime,
       },
     })
-
-    // this.setState({
-    //   chosenElement: {
-    //     ...chosenElement,
-    //     wrongSign: '',
-    //     newStartTime,
-    //   },
-    // })
   }
 
   changeNewEndTime = (newEndTime: number): void => {
     const { chosenElement, lineFormer } = this.state
     const { chosenLine, previousChanges, newStartTime, changeId } = chosenElement
     const { changes } = chosenLine
-    console.log('previousChanges', previousChanges)
     if (!previousChanges.length) {
       const currentItemIndex = 0
       const filteredChange = changes.filter(change => change.changeId !== changeId)
@@ -696,14 +687,14 @@ class MainForm extends Component<Props, State> {
     newChosenLine.changes[currentItemIndex].duration = newStartTime - newEndTime
     let wrongSign = ''
     if (newChosenLine.changes[currentItemIndex - 1].endTime >= newStartTime) {
-      newlineFormer[chosenLine.id].changes[currentItemIndex].crossingValueEnd =
-        newStartTime - newChosenLine.changes[currentItemIndex - 1].endTime
-      newChosenLine.changes[currentItemIndex].crossingValueEnd =
-        newStartTime - newChosenLine.changes[currentItemIndex - 1].endTime
+      newlineFormer[chosenLine.id].changes[currentItemIndex].crossingValueStart =
+        newChosenLine.changes[currentItemIndex - 1].endTime - newStartTime
+      newChosenLine.changes[currentItemIndex].crossingValueStart =
+        newChosenLine.changes[currentItemIndex - 1].endTime - newStartTime
       wrongSign = 'your changed value crossing next valve open time'
     } else if (newChosenLine.changes[currentItemIndex - 1].endTime < newStartTime) {
-      newChosenLine.changes[currentItemIndex].crossingValueEnd = NaN
-      newlineFormer[chosenLine.id].changes[currentItemIndex].crossingValueEnd = NaN
+      newChosenLine.changes[currentItemIndex].crossingValueStart = NaN
+      newlineFormer[chosenLine.id].changes[currentItemIndex].crossingValueStart = NaN
     }
     const maxTime = Math.max(...newlineFormer.map((lines) => {
       if (lines.changes.length) {

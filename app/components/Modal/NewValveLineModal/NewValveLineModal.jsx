@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import cn from 'classnames'
 
 import s from './NewValveLineModal.scss'
+import type { ChosenElement } from '../../../containers/MainForm/MainFormTypes'
 
 type Props = {
   closeModal: () => void,
@@ -14,8 +15,8 @@ type Props = {
 
 type ButtonProps = {
   removeValveTime: () => void,
-  chosenElement: ChosenElement,
-  closeModal: () => void,
+  // chosenElement: ChosenElement,
+  // closeModal: () => void,
 }
 
 class Button extends Component<ButtonProps> {
@@ -68,12 +69,14 @@ const NewValveLineModal = ({
   changeNewEndTime,
 }: Props) => {
 
-  const isSetValveTimeEnable = (newStartTime: number, newEndTime: number): string => {
+  const isSetValveTimeEnable = (newStartTime: number, newEndTime: number, wrongSign:string): string => {
     if (newStartTime >= newEndTime) return 'Start time should be less then End time'
+    if (wrongSign) return wrongSign
+    // if (newStartTime <= newEndTime) return 'Start time should be less then End time'
     return ''
   }
   const { chosenLine, wrongSign, newStartTime, newEndTime } = chosenElement
-  // console.log('newStartTime', newStartTime)
+  // console.log('newStartTime', newStartTime, newEndTime)
   return (
     <div className={s.root}>
       <div className={s.content}>
@@ -101,12 +104,12 @@ const NewValveLineModal = ({
               />
             </div>
           </div>
-          {isSetValveTimeEnable(newStartTime, newEndTime) ?
+          {isSetValveTimeEnable(newStartTime, newEndTime, wrongSign) ?
             <div>
-              <span>{isSetValveTimeEnable(newStartTime, newEndTime)}</span>
+              <span>{isSetValveTimeEnable(newStartTime, newEndTime, wrongSign)}</span>
             </div> : null}
           <button
-            className={cn({ [s.button_disable]: isSetValveTimeEnable(newStartTime, newEndTime) })}
+            className={cn({ [s.button_disable]: isSetValveTimeEnable(newStartTime, newEndTime, wrongSign) })}
             onClick={closeModal}
           >Ok</button>
           <button
