@@ -1,22 +1,21 @@
 // @flow
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import cn from 'classnames'
 
-import s from './NewValveLineModal.scss'
+import s from './RMPModal.scss'
 import type { ChosenElement } from '../../../containers/MainForm/MainFormTypes'
 
 type Props = {
   closeModal: () => void,
+  removeValveTime: () => void,
   chosenElement: ChosenElement,
-  changeNewStartTime: (value: number) => void,
-  changeNewEndTime: (value: number) => void,
+  changeStartTime: (value: number) => void,
 };
 
 type ButtonProps = {
   removeValveTime: () => void,
-  // chosenElement: ChosenElement,
-  // closeModal: () => void,
+  chosenElement: ChosenElement,
+  closeModal: () => void,
 }
 
 class Button extends Component<ButtonProps> {
@@ -61,26 +60,33 @@ class CustomInput extends Component<CustomInputProps> { // eslint-disable-line
     />)
   }
 }
-const NewValveLineModal = ({
-  closeModal,
-  chosenElement,
-  resetToPreviousChanges,
-  changeNewStartTime,
-  changeNewEndTime,
-}: Props) => {
 
-  const isSetValveTimeEnable = (newStartTime: number, newEndTime: number, wrongSign: string): string => {
-    if (newStartTime >= newEndTime) return 'Start time should be less then End time'
-    if (wrongSign) return wrongSign
-    // if (newStartTime <= newEndTime) return 'Start time should be less then End time'
-    return ''
-  }
-  const { chosenLine, wrongSign, newStartTime, newEndTime } = chosenElement
-  // console.log('newStartTime', newStartTime, newEndTime)
+const isSetValveTimeEnable = (startTime: number, endTime: number, RPMValue: ?number, wrongSign: string): string => {
+  if (startTime >= endTime) return 'Start time should be less then End time'
+  if (RPMValue < 100) return 'RPMValue should be greater 100'
+  if (wrongSign) return wrongSign
+  // if (newStartTime <= newEndTime) return 'Start time should be less then End time'
+  return ''
+}
+
+const RMPModal = ({
+  chosenElement,
+  closeModal,
+  changeRPMValue,
+  changeStartTime,
+  changeEndTime,
+  resetToPreviousChanges,
+  removeValveTime,
+}: Props) => {
+  const { chosenLine, changeId, wrongSign } = chosenElement
+  const filteredChange = chosenLine.changes.filter(change => change.changeId === changeId)[0]
+  const { value, startTime, endTime } = filteredChange
+  const wrongSignValue = isSetValveTimeEnable(startTime, endTime, value, wrongSign)
+
   return (
     <div className={s.root}>
       <div className={s.content}>
-        <header>Change Values</header>
+        <header>Change RPM Values</header>
         <main>
           <div className={s.inputs} >
             <div>
@@ -88,9 +94,8 @@ const NewValveLineModal = ({
               <br />
               <CustomInput
                 id="start-time"
-                changeValue={changeNewStartTime}
-                value={!isNaN(newStartTime) ? newStartTime : 0}
-              // defaultValue={!newElement ? chosenLine.changes[changeId].startTime : 0}
+                changeValue={changeStartTime}
+                value={filteredChange.startTime}
               />
             </div>
             <div>
@@ -98,20 +103,39 @@ const NewValveLineModal = ({
               <br />
               <CustomInput
                 id="end-time"
-                changeValue={changeNewEndTime}
-                value={!isNaN(newEndTime) ? newEndTime : 0}
-              // defaultValue={!newElement ? chosenLine.changes[changeId].endTime : 0}
+                changeValue={changeEndTime}
+                value={filteredChange.endTime}
               />
             </div>
           </div>
-          {isSetValveTimeEnable(newStartTime, newEndTime, wrongSign) ?
+          <div>
+            <label htmlFor="RPM_value">RPM value</label>
+            <br />
+            <CustomInput
+              id="RPM_value"
+              changeValue={changeRPMValue}
+              value={value || 0}
+            />
+          </div>
+          <div>
+            <label htmlFor="waitForValue">
+              wait for value
+              <input id="waitForValue" type="checkbox" />
+            </label>
+          </div>
+          {wrongSignValue ?
             <div>
-              <span>{isSetValveTimeEnable(newStartTime, newEndTime, wrongSign)}</span>
+              <span>{wrongSignValue}</span>
             </div> : null}
           <button
-            className={cn({ [s.button_disable]: isSetValveTimeEnable(newStartTime, newEndTime, wrongSign) })}
+            className={cn({ [s.button_disable]: wrongSignValue })}
             onClick={closeModal}
           >Ok</button>
+          <Button
+            removeValveTime={removeValveTime}
+            chosenElement={chosenElement}
+            closeModal={closeModal}
+          />
           <button
             onClick={() => {
               resetToPreviousChanges()
@@ -124,4 +148,8 @@ const NewValveLineModal = ({
   )
 }
 
-export default NewValveLineModal
+RMPModal.propTypes = {
+
+}
+
+export default RMPModal

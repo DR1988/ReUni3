@@ -4,15 +4,15 @@ import React, { Component } from 'react'
 import s from './ValveTimeComponent.scss'
 
 type Props = {
-  changeId: number,
-  duration: number,
+  changeId: number | string,
+  value: number,
   startTime: number,
   width: number,
   lineID: number,
   crossingValueStart: number,
   crossingValueEnd: number,
   showModal: () => void,
-  onClick: (lineID: number, changeId: number) => void,
+  setChosenValveTime: (lineID: number, changeId: number) => void,
 }
 
 class ValveTimeComponent extends Component<Props> {
@@ -21,15 +21,14 @@ class ValveTimeComponent extends Component<Props> {
   }
   toggleValveTime = (e: Event) => {
     e.stopPropagation()
-    const { changeId, showModal, onClick, lineID } = this.props
+    const { changeId, showModal, setChosenValveTime, lineID } = this.props
     showModal()
-    onClick(lineID, changeId)
+    setChosenValveTime(lineID, changeId)
   }
 
   getCrossingSpace = (
     { crossingValueStart, crossingValueEnd }: { crossingValueStart: number, crossingValueEnd: number },
   ): string => {
-    console.log('crossingValueStart, crossingValueEnd ', crossingValueStart, crossingValueEnd )
     if (crossingValueStart > 0 && crossingValueEnd < 0) {
       return `linear-gradient(90deg, rgba(0, 0, 0, 0) ${100 * crossingValueStart}%, rgba(171, 193, 197, 1) 0%, rgba(171, 193, 197, 1) ${100 + 100 * crossingValueEnd}%, rgba(0, 0, 0, 0) 0),
       rgba(171, 193, 197, 0.5) repeating-linear-gradient(-45deg, transparent, transparent 7.5px,
@@ -52,7 +51,9 @@ class ValveTimeComponent extends Component<Props> {
   }
 
   render() {
-    const { duration, width, startTime, crossingValueStart, crossingValueEnd } = this.props
+    const {
+      value, width, startTime, crossingValueStart, crossingValueEnd,
+    } = this.props
     // console.log('crossingValue', crossingValue)
     return (
       <div
@@ -72,7 +73,7 @@ class ValveTimeComponent extends Component<Props> {
         }}
       >
         <span className={s.timeFormer_sign}>
-          {duration}
+          {value}
         </span>
       </div>
     )

@@ -61,6 +61,13 @@ class CustomInput extends Component<CustomInputProps> { // eslint-disable-line
   }
 }
 
+const isSetValveTimeEnable = (startTime: number, endTime: number, wrongSign: string): string => {
+  if (startTime >= endTime) return 'Start time should be less then End time'
+  if (wrongSign) return wrongSign
+  // if (newStartTime <= newEndTime) return 'Start time should be less then End time'
+  return ''
+}
+
 const ValveLineModal = ({
   closeModal,
   chosenElement,
@@ -70,6 +77,10 @@ const ValveLineModal = ({
   resetToPreviousChanges,
 }: Props) => {
   const { chosenLine, changeId, wrongSign } = chosenElement
+  const filteredChange = chosenLine.changes.filter(change => change.changeId === changeId)[0]
+
+  const wrongSignValue = isSetValveTimeEnable(filteredChange.startTime, filteredChange.endTime, wrongSign)
+
   return (
     <div className={s.root}>
       <div className={s.content}>
@@ -82,7 +93,7 @@ const ValveLineModal = ({
               <CustomInput
                 id="start-time"
                 changeValue={changeStartTime}
-                value={chosenLine.changes[changeId].startTime}
+                value={filteredChange.startTime}
               />
             </div>
             <div>
@@ -91,16 +102,16 @@ const ValveLineModal = ({
               <CustomInput
                 id="end-time"
                 changeValue={changeEndTime}
-                value={chosenLine.changes[changeId].endTime}
+                value={filteredChange.endTime}
               />
             </div>
           </div>
-          {wrongSign ?
+          {wrongSignValue ?
             <div>
-              <span>{wrongSign}</span>
+              <span>{wrongSignValue}</span>
             </div> : null}
           <button
-            className={cn({ [s.button_disable]: wrongSign })}
+            className={cn({ [s.button_disable]: wrongSignValue })}
             onClick={closeModal}
           >Ok</button>
           <Button

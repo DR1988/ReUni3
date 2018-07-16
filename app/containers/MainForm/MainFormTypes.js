@@ -5,6 +5,7 @@ export type Change ={
   changeId: number | string,
   duration: number,
   waitForValue?: boolean,
+  value?: number,
   crossingValueStart: number,
   crossingValueEnd: number,
 }
@@ -25,6 +26,8 @@ export type ChosenElement = {
   wrongSign: string,
   newStartTime: number,
   newEndTime: number,
+  newRPMValue?: number,
+  newTempValue?: number,
 }
 
 export type State = {

@@ -9,6 +9,8 @@ import type { ValveLineType, Change, ChosenElement, LineFormer } from './MainFor
 import Modal from '../../components/Modal'
 import ValveLineModal from '../../components/Modal/ValveLineModal'
 import NewValveLineModal from '../../components/Modal/NewValveLineModal'
+import RMPModal from '../../components/Modal/RMPModal'
+import NewRMPModal from '../../components/Modal/NewRMPModal'
 import { withCondition } from '../../components/HOC'
 
 const ModalWithCondition = withCondition(props => <Modal {...props} />)
@@ -35,89 +37,78 @@ class MainForm extends Component<Props, State> {
           name: 'ValveLine',
           id: 0,
           shortName: 'GV1',
-          changes: [{ startTime: 0, endTime: 20, changeId: 0, duration: 20, crossingValueEnd: NaN, crossingValueStart: NaN }],
+          changes: [{ startTime: 0, endTime: 0, changeId: 0, duration: 0, crossingValueEnd: NaN, crossingValueStart: NaN }],
         },
         newStartTime: 0,
         newEndTime: 0,
-        previousChanges: [{ startTime: 0, endTime: 20, changeId: 0, duration: 20, crossingValueEnd: NaN, crossingValueStart: NaN }],
+        previousChanges: [{ startTime: 0, endTime: 0, changeId: 0, duration: 0, crossingValueEnd: NaN, crossingValueStart: NaN }],
         changeId: 0,
         newElement: false,
       },
       distance: 0,
       time: 0,
       showEditModal: false,
-      allTime: 350,
+      allTime: 0,
       lineFormer: [
         {
           name: 'ValveLine',
           id: 0,
           shortName: 'GV1',
-          changes: [{ startTime: 0, endTime: 20, changeId: 0, duration: 20, crossingValueEnd: NaN, crossingValueStart: NaN }],
+          changes: [],
         },
         {
           name: 'ValveLine',
           id: 1,
           shortName: 'GV2',
-          changes: [{ startTime: 0, endTime: 0, changeId: 0, duration: 0, crossingValueEnd: NaN, crossingValueStart: NaN }],
+          changes: [],
         },
         {
           name: 'ValveLine',
           id: 2,
           shortName: 'GV3',
-          changes: [{ startTime: 0, endTime: 10, changeId: 0, duration: 10, crossingValueEnd: NaN, crossingValueStart: NaN }],
+          changes: [],
         },
         {
           name: 'ValveLine',
           id: 3,
           shortName: 'GV4',
-          changes: [{ startTime: 0, endTime: 0, changeId: 0, duration: 0, crossingValueEnd: NaN, crossingValueStart: NaN }],
+          changes: [],
         },
         {
           name: 'ValveLine',
           id: 4,
           shortName: 'GV5',
-          changes: [{ startTime: 0, endTime: 0, changeId: 0, duration: 0, crossingValueEnd: NaN, crossingValueStart: NaN }],
+          changes: [],
         },
         {
           name: 'ValveLine',
           id: 5,
           shortName: 'GV6',
-          changes: [{ startTime: 0, endTime: 0, changeId: 0, duration: 0, crossingValueEnd: NaN, crossingValueStart: NaN }],
+          changes: [],
         },
         {
           name: 'ValveLine',
           id: 6,
           shortName: 'HV1',
-          changes: [{ startTime: 0, endTime: 100, changeId: 0, duration: 100, crossingValueEnd: NaN, crossingValueStart: NaN }],
+          changes: [],
         },
         {
           name: 'ValveLine',
           id: 7,
           shortName: 'HV2',
-          changes: [{ startTime: 0, endTime: 100, changeId: 0, duration: 100, crossingValueEnd: NaN, crossingValueStart: NaN }],
+          changes: [],
         },
         {
           name: 'RPMSetter',
           shortName: 'RPM',
           id: 8,
-          changes: [
-            {
-              startTime: 300,
-              endTime: 350,
-              value: 1000,
-              changeId: 0,
-              duration: 50,
-              waitForValue: true,
-              crossingValueEnd: NaN,
-              crossingValueStart: NaN,
-            },
-          ],
+          changes: [],
         },
         {
           name: 'TempSetter',
           shortName: 'T°C',
           id: 9,
-          changes: [{ startTime: 300, endTime: 350, value: 45, changeId: 0, duration: 50, crossingValueEnd: NaN, crossingValueStart: NaN }],
+          changes: [],
         },
       ],
     }
@@ -126,14 +117,23 @@ class MainForm extends Component<Props, State> {
   state = {
     chosenElement: {
       chosenLine: {
-        name: 'ValveLine',
-        id: 0,
-        shortName: 'GV1',
-        changes: [{ startTime: 0, endTime: 20, changeId: 0, duration: 20, crossingValueEnd: NaN, crossingValueStart: NaN }],
+        name: 'RPMSetter',
+        id: 8,
+        shortName: 'RPM',
+        changes: [{
+          startTime: 300,
+          endTime: 350,
+          value: 1000,
+          changeId: 0,
+          duration: 50,
+          waitForValue: true,
+          crossingValueEnd: NaN,
+          crossingValueStart: NaN,
+        }],
       },
       newStartTime: 0,
       newEndTime: 0,
-      previousChanges: [{ startTime: 0, endTime: 20, changeId: 0, duration: 20, crossingValueEnd: NaN, crossingValueStart: NaN }],
+      previousChanges: [],
       newElement: false,
       changeId: 0,
       wrongSign: '',
@@ -247,10 +247,12 @@ class MainForm extends Component<Props, State> {
         ...this.state.chosenElement,
         chosenLine: {
           ...chosenLine,
-          name: 'NewValveLine',
+          name: `New${chosenLine.name}`,
         },
         newEndTime: 0,
         newStartTime: 0,
+        newRPMValue: 0,
+        newTempValue: 0,
         changeId: shortid.generate(),
         newElement: true,
         previousChanges: [...chosenLine.changes],
@@ -324,16 +326,7 @@ class MainForm extends Component<Props, State> {
 
     const index = lineFormer[chosenLine.id].changes.findIndex(change => change.changeId === changeId)
     const startTime = lineFormer[chosenLine.id].changes[index].startTime
-    if (value <= startTime) {
-      this.setState({
-        ...this.state,
-        chosenElement: {
-          ...this.state.chosenElement,
-          wrongSign: 'end time should be greater than start time',
-        },
-      })
-      return
-    }
+
     const newlineFormer = cloneDeep(lineFormer)
     newlineFormer[chosenLine.id].changes[index].endTime = value
     newlineFormer[chosenLine.id].changes[index].duration = startTime - value
@@ -350,13 +343,14 @@ class MainForm extends Component<Props, State> {
       } else if (chosenLine.changes[index + 1].startTime > value) {
         newChosenLine.changes[index].crossingValueEnd = NaN
         newlineFormer[chosenLine.id].changes[index].crossingValueEnd = NaN
+        wrongSign = ''
       }
       this.setState({
         ...this.state,
         lineFormer: newlineFormer,
         chosenElement: {
           ...this.state.chosenElement,
-          wrongSign: this.setWrongSign(wrongSign),
+          wrongSign,
           chosenLine: newChosenLine,
         },
       })
@@ -388,16 +382,7 @@ class MainForm extends Component<Props, State> {
 
     const index = lineFormer[chosenLine.id].changes.findIndex(change => change.changeId === changeId)
     const endTime = lineFormer[chosenLine.id].changes[index].endTime
-    if (value >= endTime) {
-      this.setState({
-        ...this.state,
-        chosenElement: {
-          ...this.state.chosenElement,
-          wrongSign: 'start time should be less than end time',
-        },
-      })
-      return
-    }
+
     const newlineFormer = cloneDeep(lineFormer)
     newlineFormer[chosenLine.id].changes[index].startTime = value
     newlineFormer[chosenLine.id].changes[index].duration = endTime - value
@@ -414,13 +399,14 @@ class MainForm extends Component<Props, State> {
       } else if (chosenLine.changes[index - 1].endTime < value) {
         newChosenLine.changes[index].crossingValueStart = NaN
         newlineFormer[chosenLine.id].changes[index].crossingValueStart = NaN
+        wrongSign = ''
       }
       this.setState({
         ...this.state,
         lineFormer: newlineFormer,
         chosenElement: {
           ...this.state.chosenElement,
-          wrongSign: this.setWrongSign(wrongSign),
+          wrongSign,
           chosenLine: newChosenLine,
         },
       })
@@ -469,7 +455,7 @@ class MainForm extends Component<Props, State> {
       newlineFormer[chosenLine.id].changes[currentItemIndex].duration = newEndTime - newStartTime
       const newChosenLine: ValveLineType = cloneDeep(chosenLine)
       newChosenLine.changes = newChanges
-      newChosenLine.changes[currentItemIndex].duration = newStartTime - newEndTime
+      newChosenLine.changes[currentItemIndex].duration = newEndTime - newStartTime
       this.setState({
         ...this.state,
         lineFormer: newlineFormer,
@@ -501,7 +487,7 @@ class MainForm extends Component<Props, State> {
           newlineFormer[chosenLine.id].changes[currentItemIndex].duration = newEndTime - newStartTime
           const newChosenLine: ValveLineType = cloneDeep(chosenLine)
           newChosenLine.changes = newChanges
-          newChosenLine.changes[currentItemIndex].duration = newStartTime - newEndTime
+          newChosenLine.changes[currentItemIndex].duration = newEndTime - newStartTime
 
           let wrongSign = ''
           if (newChosenLine.changes[currentItemIndex + 1].startTime <= newEndTime) {
@@ -593,7 +579,7 @@ class MainForm extends Component<Props, State> {
       newlineFormer[chosenLine.id].changes[currentItemIndex].duration = newEndTime - newStartTime
       const newChosenLine: ValveLineType = cloneDeep(chosenLine)
       newChosenLine.changes = newChanges
-      newChosenLine.changes[currentItemIndex].duration = newStartTime - newEndTime
+      newChosenLine.changes[currentItemIndex].duration = newEndTime - newStartTime
       const maxTime = Math.max(...newlineFormer.map((lines) => {
         if (lines.changes.length) {
           return lines.changes[lines.changes.length - 1].endTime
@@ -635,7 +621,7 @@ class MainForm extends Component<Props, State> {
           newlineFormer[chosenLine.id].changes[currentItemIndex].duration = newEndTime - newStartTime
           const newChosenLine: ValveLineType = cloneDeep(chosenLine)
           newChosenLine.changes = newChanges
-          newChosenLine.changes[currentItemIndex].duration = newStartTime - newEndTime
+          newChosenLine.changes[currentItemIndex].duration = newEndTime - newStartTime
 
           let wrongSign = ''
           if (newChosenLine.changes[currentItemIndex + 1].startTime <= newEndTime) {
@@ -726,6 +712,48 @@ class MainForm extends Component<Props, State> {
     }
   }
 
+  changeRPMValue = (RPMValue: number) => {
+    const { chosenElement, lineFormer } = this.state
+    const { changeId, chosenLine } = chosenElement
+    const index = lineFormer[chosenLine.id].changes.findIndex(change => change.changeId === changeId)
+
+    if (RPMValue >= 0) {
+      const newlineFormer = cloneDeep(lineFormer)
+      newlineFormer[chosenLine.id].changes[index].value = RPMValue
+      const newChosenLine: ValveLineType = cloneDeep(chosenLine)
+      newChosenLine.changes[index].value = RPMValue
+      this.setState({
+        ...this.state,
+        lineFormer: newlineFormer,
+        chosenElement: {
+          ...this.state.chosenElement,
+          chosenLine: newChosenLine,
+        },
+      })
+    }
+  }
+
+  changeNewRPMValue = (RPMValue: number) => {
+    const { chosenElement, lineFormer } = this.state
+    const { changeId, chosenLine } = chosenElement
+    const index = lineFormer[chosenLine.id].changes.findIndex(change => change.changeId === changeId)
+    if (RPMValue >= 0) {
+      const newlineFormer = cloneDeep(lineFormer)
+      newlineFormer[chosenLine.id].changes[index].value = RPMValue
+      const newChosenLine: ValveLineType = cloneDeep(chosenLine)
+      newChosenLine.changes[index].value = RPMValue
+      this.setState({
+        ...this.state,
+        lineFormer: newlineFormer,
+        chosenElement: {
+          ...this.state.chosenElement,
+          newRPMValue: RPMValue,
+          chosenLine: newChosenLine,
+        },
+      })
+    }
+  }
+
   render() {
     const { chosenElement, lineFormer, showEditModal } = this.state
     const { changeId, chosenLine } = chosenElement
@@ -762,6 +790,26 @@ class MainForm extends Component<Props, State> {
                 resetToPreviousChanges={this.resetToPreviousChanges}
                 changeNewStartTime={this.changeNewStartTime}
                 changeNewEndTime={this.changeNewEndTime}
+              />)
+            case 'RPMSetter':
+              return (<RMPModal
+                removeValveTime={this.removeValveTime}
+                chosenElement={chosenElement}
+                closeModal={this.closeModal}
+                changeRPMValue={this.changeRPMValue}
+                resetToPreviousChanges={this.resetToPreviousChanges}
+                changeStartTime={this.changeStartTime}
+                changeEndTime={this.changeEndTime}
+              />)
+            case 'NewRPMSetter':
+              return (<NewRMPModal
+                removeValveTime={this.removeValveTime}
+                chosenElement={chosenElement}
+                closeModal={this.closeModal}
+                changeRPMValue={this.changeNewRPMValue}
+                resetToPreviousChanges={this.resetToPreviousChanges}
+                changeStartTime={this.changeNewStartTime}
+                changeEndTime={this.changeNewEndTime}
               />)
             default: return <div>asd</div>
           }

@@ -17,15 +17,30 @@ class ValveLineComponent extends Component<Props> {
     super(props)
   }
 
+  setValue = (
+    lineName: 'ValveLine' | 'RPMSetter' | 'TempSetter' | 'NewValveLine' | 'NewRPMSetter' | 'NewTempSetter',
+    value: number, duration: number): number => {
+    switch (lineName) {
+      case 'RPMSetter':
+      case 'TempSetter':
+        return value
+      default:
+        return duration
+    }
+  }
+
   render() {
     const { showModal, setChosenValveTime, allTime, line } = this.props
+    const lineName = line.name
     return (
       <div
         className={s['time-box_keeper']}
       >
         {line.changes.map((el) => {
-          const { startTime, endTime, crossingValueEnd, crossingValueStart } = el
+          const { startTime, endTime, value, crossingValueEnd, crossingValueStart } = el
           const duration = endTime - startTime
+          // console.log('value', value)
+          // console.log('el', el)
           // const width = 100 * ((duration + gapTime) / allTime)
           return (
             // <div
@@ -40,11 +55,11 @@ class ValveLineComponent extends Component<Props> {
                 key={el.changeId}
                 lineID={line.id}
                 changeId={el.changeId}
-                duration={duration}
+                value={this.setValue(lineName, value || 0, duration)}
                 startTime={startTime / allTime}
                 width={duration / allTime}
                 showModal={showModal}
-                onClick={setChosenValveTime}
+                setChosenValveTime={setChosenValveTime}
                 crossingValueEnd={crossingValueEnd / duration}
                 crossingValueStart={crossingValueStart / duration}
               />
