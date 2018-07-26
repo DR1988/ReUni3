@@ -64,6 +64,7 @@ class CustomInput extends Component<CustomInputProps> { // eslint-disable-line
 const isSetValveTimeEnable = (startTime: number, endTime: number, RPMValue: ?number, wrongSign: string): string => {
   if (startTime >= endTime) return 'Start time should be less then End time'
   if (RPMValue < 100) return 'RPMValue should be greater 100'
+  if (RPMValue > 3000) return 'RPMValue should be less 3000'
   if (wrongSign) return wrongSign
   // if (newStartTime <= newEndTime) return 'Start time should be less then End time'
   return ''

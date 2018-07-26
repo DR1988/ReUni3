@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import cn from 'classnames'
 
-import s from './NewRMPModal.scss'
+import s from './TempModal.scss'
 import type { ChosenElement } from '../../../containers/MainForm/MainFormTypes'
 
 type Props = {
@@ -37,14 +37,10 @@ type CustomInputProps = {
   // defaultValue: number,
   id: string | number,
   value: number,
-  disabled: boolean,
   changeValue: (value: number) => void,
 }
 
 class CustomInput extends Component<CustomInputProps> { // eslint-disable-line
-  static defaultProps = {
-    disabled: false,
-  }
   constructor(props: CustomInputProps) { // eslint-disable-line
     super(props)
   }
@@ -55,10 +51,9 @@ class CustomInput extends Component<CustomInputProps> { // eslint-disable-line
     }
   }
   render() {
-    const { value, id, disabled } = this.props
+    const { value, id } = this.props
     return (<input
       id={id}
-      disabled={disabled}
       type="text"
       onChange={this._changeValue}
       value={value}
@@ -66,30 +61,33 @@ class CustomInput extends Component<CustomInputProps> { // eslint-disable-line
   }
 }
 
-const getWrongValue = (startTime: number, endTime: number, RPMValue: number, wrongSign: string): string => {
+const isSetValveTimeEnable = (startTime: number, endTime: number, TempValue: ?number, wrongSign: string): string => {
   if (startTime >= endTime) return 'Start time should be less then End time'
-  if (RPMValue < 100) return 'RPMValue should be greater 100'
-  if (RPMValue > 3000) return 'RPMValue should be less 3000'
+  if (TempValue < 10) return 'TempValue should be greater 10'
+  if (TempValue > 70) return 'TempValue should be less 70'
   if (wrongSign) return wrongSign
   // if (newStartTime <= newEndTime) return 'Start time should be less then End time'
   return ''
 }
 
-const NewRMPModal = ({
+const TempModal = ({
   chosenElement,
   closeModal,
-  changeRPMValue,
+  changeTempValue,
   changeStartTime,
   changeEndTime,
   resetToPreviousChanges,
   removeValveTime,
 }: Props) => {
-  const { wrongSign, newRPMValue, newStartTime, newEndTime } = chosenElement
-  const wrongSignValue = getWrongValue(newStartTime, newEndTime, newRPMValue || 0, wrongSign)
+  const { chosenLine, changeId, wrongSign } = chosenElement
+  const filteredChange = chosenLine.changes.filter(change => change.changeId === changeId)[0]
+  const { value, startTime, endTime } = filteredChange
+  const wrongSignValue = isSetValveTimeEnable(startTime, endTime, value, wrongSign)
+
   return (
     <div className={s.root}>
       <div className={s.content}>
-        <header>Change RPM Values</header>
+        <header>Change Temp Values</header>
         <main>
           <div className={s.inputs} >
             <div>
@@ -98,7 +96,7 @@ const NewRMPModal = ({
               <CustomInput
                 id="start-time"
                 changeValue={changeStartTime}
-                value={newStartTime}
+                value={filteredChange.startTime}
               />
             </div>
             <div>
@@ -107,18 +105,17 @@ const NewRMPModal = ({
               <CustomInput
                 id="end-time"
                 changeValue={changeEndTime}
-                value={newEndTime}
+                value={filteredChange.endTime}
               />
             </div>
           </div>
           <div>
-            <label htmlFor="RPM_value">RPM value</label>
+            <label htmlFor="Temp_value">Temp value</label>
             <br />
             <CustomInput
-              disabled={!newStartTime && !newEndTime}
-              id="RPM_value"
-              changeValue={changeRPMValue}
-              value={newRPMValue || 0}
+              id="Temp_value"
+              changeValue={changeTempValue}
+              value={value || 0}
             />
           </div>
           <div>
@@ -152,8 +149,8 @@ const NewRMPModal = ({
   )
 }
 
-NewRMPModal.propTypes = {
+TempModal.propTypes = {
 
 }
 
-export default NewRMPModal
+export default TempModal

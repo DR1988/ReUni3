@@ -11,6 +11,9 @@ import ValveLineModal from '../../components/Modal/ValveLineModal'
 import NewValveLineModal from '../../components/Modal/NewValveLineModal'
 import RMPModal from '../../components/Modal/RMPModal'
 import NewRMPModal from '../../components/Modal/NewRMPModal'
+import NewTempModal from '../../components/Modal/NewTempModal'
+import TempModal from '../../components/Modal/TempModal'
+
 import { withCondition } from '../../components/HOC'
 
 const ModalWithCondition = withCondition(props => <Modal {...props} />)
@@ -733,6 +736,27 @@ class MainForm extends Component<Props, State> {
     }
   }
 
+  changeTempValue = (TempValue: number) => {
+    const { chosenElement, lineFormer } = this.state
+    const { changeId, chosenLine } = chosenElement
+    const index = lineFormer[chosenLine.id].changes.findIndex(change => change.changeId === changeId)
+
+    if (TempValue >= 0) {
+      const newlineFormer = cloneDeep(lineFormer)
+      newlineFormer[chosenLine.id].changes[index].value = TempValue
+      const newChosenLine: ValveLineType = cloneDeep(chosenLine)
+      newChosenLine.changes[index].value = TempValue
+      this.setState({
+        ...this.state,
+        lineFormer: newlineFormer,
+        chosenElement: {
+          ...this.state.chosenElement,
+          chosenLine: newChosenLine,
+        },
+      })
+    }
+  }
+
   changeNewRPMValue = (RPMValue: number) => {
     const { chosenElement, lineFormer } = this.state
     const { changeId, chosenLine } = chosenElement
@@ -753,6 +777,28 @@ class MainForm extends Component<Props, State> {
       })
     }
   }
+
+  changeNewTempValue = (TempValue: number) => {
+    const { chosenElement, lineFormer } = this.state
+    const { changeId, chosenLine } = chosenElement
+    const index = lineFormer[chosenLine.id].changes.findIndex(change => change.changeId === changeId)
+    if (TempValue >= 0) {
+      const newlineFormer = cloneDeep(lineFormer)
+      newlineFormer[chosenLine.id].changes[index].value = TempValue
+      const newChosenLine: ValveLineType = cloneDeep(chosenLine)
+      newChosenLine.changes[index].value = TempValue
+      this.setState({
+        ...this.state,
+        lineFormer: newlineFormer,
+        chosenElement: {
+          ...this.state.chosenElement,
+          newTempValue: TempValue,
+          chosenLine: newChosenLine,
+        },
+      })
+    }
+  }
+
 
   render() {
     const { chosenElement, lineFormer, showEditModal } = this.state
@@ -807,6 +853,26 @@ class MainForm extends Component<Props, State> {
                 chosenElement={chosenElement}
                 closeModal={this.closeModal}
                 changeRPMValue={this.changeNewRPMValue}
+                resetToPreviousChanges={this.resetToPreviousChanges}
+                changeStartTime={this.changeNewStartTime}
+                changeEndTime={this.changeNewEndTime}
+              />)
+            case 'TempSetter':
+              return (<TempModal
+                removeValveTime={this.removeValveTime}
+                chosenElement={chosenElement}
+                closeModal={this.closeModal}
+                changeTempValue={this.changeTempValue}
+                resetToPreviousChanges={this.resetToPreviousChanges}
+                changeStartTime={this.changeStartTime}
+                changeEndTime={this.changeEndTime}
+              />)
+            case 'NewTempSetter':
+              return (<NewTempModal
+                removeValveTime={this.removeValveTime}
+                chosenElement={chosenElement}
+                closeModal={this.closeModal}
+                changeTempValue={this.changeNewTempValue}
                 resetToPreviousChanges={this.resetToPreviousChanges}
                 changeStartTime={this.changeNewStartTime}
                 changeEndTime={this.changeNewEndTime}

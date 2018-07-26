@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import cn from 'classnames'
 
-import s from './NewRMPModal.scss'
+import s from './NewTempModal.scss'
 import type { ChosenElement } from '../../../containers/MainForm/MainFormTypes'
 
 type Props = {
@@ -66,30 +66,30 @@ class CustomInput extends Component<CustomInputProps> { // eslint-disable-line
   }
 }
 
-const getWrongValue = (startTime: number, endTime: number, RPMValue: number, wrongSign: string): string => {
+const getWrongValue = (startTime: number, endTime: number, TempValue: number, wrongSign: string): string => {
   if (startTime >= endTime) return 'Start time should be less then End time'
-  if (RPMValue < 100) return 'RPMValue should be greater 100'
-  if (RPMValue > 3000) return 'RPMValue should be less 3000'
+  if (TempValue < 10) return 'TempValue should be greater 10'
+  if (TempValue > 70) return 'TempValue should be less 70'
   if (wrongSign) return wrongSign
   // if (newStartTime <= newEndTime) return 'Start time should be less then End time'
   return ''
 }
 
-const NewRMPModal = ({
+const NewTempModal = ({
   chosenElement,
   closeModal,
-  changeRPMValue,
+  changeTempValue,
   changeStartTime,
   changeEndTime,
   resetToPreviousChanges,
   removeValveTime,
 }: Props) => {
-  const { wrongSign, newRPMValue, newStartTime, newEndTime } = chosenElement
-  const wrongSignValue = getWrongValue(newStartTime, newEndTime, newRPMValue || 0, wrongSign)
+  const { wrongSign, newTempValue, newStartTime, newEndTime } = chosenElement
+  const wrongSignValue = getWrongValue(newStartTime, newEndTime, newTempValue || 0, wrongSign)
   return (
     <div className={s.root}>
       <div className={s.content}>
-        <header>Change RPM Values</header>
+        <header>Change Temp Values</header>
         <main>
           <div className={s.inputs} >
             <div>
@@ -112,13 +112,13 @@ const NewRMPModal = ({
             </div>
           </div>
           <div>
-            <label htmlFor="RPM_value">RPM value</label>
+            <label htmlFor="Temp_value">Temp value</label>
             <br />
             <CustomInput
               disabled={!newStartTime && !newEndTime}
-              id="RPM_value"
-              changeValue={changeRPMValue}
-              value={newRPMValue || 0}
+              id="Temp_value"
+              changeValue={changeTempValue}
+              value={newTempValue || 0}
             />
           </div>
           <div>
@@ -152,8 +152,8 @@ const NewRMPModal = ({
   )
 }
 
-NewRMPModal.propTypes = {
+NewTempModal.propTypes = {
 
 }
 
-export default NewRMPModal
+export default NewTempModal
