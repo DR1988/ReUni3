@@ -3,6 +3,7 @@ import React, { Component } from 'react' // eslint-disable-line
 // import PropTypes from 'prop-types'
 import cloneDeep from 'lodash/cloneDeep'
 import shortid from 'shortid'
+import io from 'socket.io-client'
 
 import MainFormComponent from '../../components/MainFormComponent'
 import type { ValveLineType, Change, ChosenElement, LineFormer } from './MainFormTypes'
@@ -15,6 +16,8 @@ import NewTempModal from '../../components/Modal/NewTempModal'
 import TempModal from '../../components/Modal/TempModal'
 
 import { withCondition } from '../../components/HOC'
+
+const socket = io(`${location.origin}`)
 
 const ModalWithCondition = withCondition(props => <Modal {...props} />)
 
@@ -799,7 +802,9 @@ class MainForm extends Component<Props, State> {
     }
   }
 
-
+ start = () => {
+   console.log(123)
+ }
   render() {
     const { chosenElement, lineFormer, showEditModal } = this.state
     const { changeId, chosenLine } = chosenElement
@@ -810,6 +815,7 @@ class MainForm extends Component<Props, State> {
     >
       <MainFormComponent
         resetState={this.resetState}
+        start={this.start}
         showModal={this.showModal}
         addNewValveTime={this.addNewValveTime}
         setChosenValveTime={this.setChosenValveTime}
@@ -879,10 +885,6 @@ class MainForm extends Component<Props, State> {
               />)
             default: return <div>asd</div>
           }
-          // return (<ValveLineModal
-          //   chosenLine={this.state.chosenLine}
-          //   closeModal={this.closeModal}
-          // />)
         }}
       />
     </div>

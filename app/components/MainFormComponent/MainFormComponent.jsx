@@ -36,6 +36,7 @@ class MainFormComponent extends Component<Props, State> {
       resetState,
       addNewValveTime,
       setChosenValveTime,
+      start,
     } = this.props
     // console.log(lineFormer[0].changes[1]
     return (
@@ -63,7 +64,8 @@ class MainFormComponent extends Component<Props, State> {
               allTime={allTime}
             />
             <div className={s.buttons} >
-              <button onClick={resetState} >Reset</button>
+              <button onClick={resetState}>Reset</button>
+              <button onClick={start}>Start</button>
             </div>
           </section>
           <ValveTimeComponentAdder
