@@ -16,6 +16,7 @@ import NewTempModal from '../../components/Modal/NewTempModal'
 import TempModal from '../../components/Modal/TempModal'
 
 import { withCondition } from '../../components/HOC'
+import { socketConfig } from '../../../config'
 
 const socket = io(`${location.origin}`)
 
@@ -228,17 +229,39 @@ class MainForm extends Component<Props, State> {
     ],
   }
 
+  componentDidMount() {
+    socket.on(socketConfig.makeChange, (data) => {
+      console.log('data', data)
+      this.setState({
+        ...data,
+      })
+    })
+  }
+
+  componentWillUnmount() {
+    socket.removeAllListeners()
+  }
+
+  start = () => {
+    const { lineFormer, allTime } = this.state
+    socket.emit(socketConfig.makeChange, {
+      lineFormer,
+      allTime,
+    })
+  }
+
   setChosenValveTime = (lineID: number, changeId: number): void => {
     const chosenLine: ValveLineType = this.state.lineFormer.filter(line => line.id === lineID)[0]
     // console.log('chosenLine.changes', chosenLine)
+    const chosenElement = {
+      ...this.state.chosenElement,
+      chosenLine,
+      changeId,
+      newElement: false,
+      previousChanges: [...chosenLine.changes],
+    }
     this.setState({
-      chosenElement: {
-        ...this.state.chosenElement,
-        chosenLine,
-        changeId,
-        newElement: false,
-        previousChanges: [...chosenLine.changes],
-      },
+      chosenElement,
     })
   }
 
@@ -281,7 +304,7 @@ class MainForm extends Component<Props, State> {
         ...this.state.chosenElement,
         wrongSign: '',
       },
-    })
+    }, () => this.emitChanges())
   }
 
   resetToPreviousChanges = () => {
@@ -318,12 +341,14 @@ class MainForm extends Component<Props, State> {
 
     const newlineFormer = cloneDeep(lineFormer)
     newlineFormer[chosenLine.id].changes = changes
-    this.setState({
+    const newState = {
       ...this.state,
       lineFormer: newlineFormer,
       showEditModal: false,
       chosenElement: newChosenElement,
-    })
+    }
+    socket.emit(socketConfig.makeChange, newState)
+    this.setState({ ...newState })
   }
 
   changeEndTime = (value: number): void => {
@@ -351,7 +376,7 @@ class MainForm extends Component<Props, State> {
         newlineFormer[chosenLine.id].changes[index].crossingValueEnd = NaN
         wrongSign = ''
       }
-      this.setState({
+      const newState = {
         ...this.state,
         lineFormer: newlineFormer,
         chosenElement: {
@@ -359,7 +384,8 @@ class MainForm extends Component<Props, State> {
           wrongSign,
           chosenLine: newChosenLine,
         },
-      })
+      }
+      this.setState(newState)
       return
     }
 
@@ -802,9 +828,10 @@ class MainForm extends Component<Props, State> {
     }
   }
 
- start = () => {
-   console.log(123)
- }
+  emitChanges = () => {
+    socket.emit(socketConfig.makeChange, { ...this.state, showEditModal: false })
+  }
+
   render() {
     const { chosenElement, lineFormer, showEditModal } = this.state
     const { changeId, chosenLine } = chosenElement

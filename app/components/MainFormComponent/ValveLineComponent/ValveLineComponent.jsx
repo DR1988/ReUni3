@@ -60,8 +60,8 @@ class ValveLineComponent extends Component<Props> {
                 width={duration / allTime}
                 showModal={showModal}
                 setChosenValveTime={setChosenValveTime}
-                crossingValueEnd={crossingValueEnd / duration}
-                crossingValueStart={crossingValueStart / duration}
+                crossingValueEnd={crossingValueEnd}
+                crossingValueStart={crossingValueStart}
               />
             // </div>
           )

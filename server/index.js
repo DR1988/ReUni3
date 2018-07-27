@@ -5,6 +5,7 @@ import socket from 'socket.io'
 import webpackMidlleware from './middlewares/webpack'
 // import renderMiddleware from './middlewares/renderHTML'
 import staticMiddleware from './middlewares/static'
+import connection from './socketHandlers/connection'
 
 const app = express()
 const http = require('http').Server(app)
@@ -13,14 +14,14 @@ const port = process.env.PORT ? process.env.PORT : 3000
 // const host = process.env.host ? process.env.host : 'localhost'
  /* eslint-disable no-console */
 
+
 app.use(webpackMidlleware)
 app.use(staticMiddleware)
 // app.use(renderMiddleware)
-
 const io = socket(http)
-io.on('connection', socket => {
-  console.log('a user connected')
-})
+
+io.on('connection', s => connection(s, io))
+
 app.use(express.static(path.resolve(__dirname, './../')))
 app.get(/.*/, (req, res) =>
      res.sendFile(path.resolve('index.html')),
