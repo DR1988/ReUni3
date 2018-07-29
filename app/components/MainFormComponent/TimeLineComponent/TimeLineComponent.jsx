@@ -27,7 +27,6 @@ const TimeLineComponent = (props) => {
     }
   }
   // console.log(scale)
-  // console.log('distance', props.distance, 'time', props.time)
   return (<div className={s['time-line_wraper']}>
     <div className={s['time-line']} style={{ width: props.width }} >
       <div className={s['time-show']}>
@@ -57,8 +56,9 @@ TimeLineComponent.propTypes = {
 
 TimeLineComponent.defaultProps = {
   width: '100%',
-  distance: 0,
+  distance: 10,
   currentTime: 10,
+  time: 10,
 }
 
 TimeLineComponent.propTypes = {

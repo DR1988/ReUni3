@@ -244,6 +244,13 @@ class MainForm extends Component<Props, State> {
         })
       }
     })
+    socket.on(socketConfig.start, (data) => {
+      const { distance, time } = data
+      this.setState({
+        distance,
+        time,
+      })
+    })
   }
 
   componentWillUnmount() {
@@ -252,7 +259,10 @@ class MainForm extends Component<Props, State> {
 
   start = () => {
     const { lineFormer, allTime } = this.state
-    socket.emit(socketConfig.start, this.state.lineFormer)
+    socket.emit(socketConfig.start, {
+      lineFormer,
+      allTime,
+    })
     // socket.emit(socketConfig.makeChange, {
     //   lineFormer,
     //   allTime,
@@ -510,6 +520,7 @@ class MainForm extends Component<Props, State> {
     }
     let currentItemIndex = previousChanges.length
     if (newEndTime <= changes[previousChanges.length - 1].endTime) {
+      console.log(1231)
       for (let i = 0; i < previousChanges.length; i += 1) {
         if (newEndTime <= previousChanges[i].endTime) {
           currentItemIndex = i
@@ -843,6 +854,10 @@ class MainForm extends Component<Props, State> {
     socket.emit(socketConfig.makeChange, { ...this.state, showEditModal: false })
   }
 
+  pause = () => {
+    socket.emit(socketConfig.pause)
+  }
+
   render() {
     const { chosenElement, lineFormer, showEditModal } = this.state
     const { changeId, chosenLine } = chosenElement
@@ -854,6 +869,7 @@ class MainForm extends Component<Props, State> {
       <MainFormComponent
         resetState={this.resetState}
         start={this.start}
+        pause={this.pause}
         showModal={this.showModal}
         addNewValveTime={this.addNewValveTime}
         setChosenValveTime={this.setChosenValveTime}

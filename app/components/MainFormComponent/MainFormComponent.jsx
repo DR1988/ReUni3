@@ -38,6 +38,7 @@ class MainFormComponent extends Component<Props, State> {
       setChosenValveTime,
       start,
       chosenElement,
+      pause,
     } = this.props
     // console.log('this.props', this.props)
 
@@ -70,6 +71,7 @@ class MainFormComponent extends Component<Props, State> {
             <div className={s.buttons} >
               <button onClick={resetState}>Reset</button>
               <button onClick={start}>Start</button>
+              <button onClick={pause}>Pause</button>
             </div>
           </section>
           <ValveTimeComponentAdder

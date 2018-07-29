@@ -62,7 +62,7 @@ class ValveTimeComponent extends Component<Props> {
       changeId,
     } = this.props
     // console.log('this.props.changeId ', this.props.changeId)
-    console.log('chosenElement', chosenElement)
+    // console.log('chosenElement', chosenElement)
     return (
       <div
         className={s.timeFormer}

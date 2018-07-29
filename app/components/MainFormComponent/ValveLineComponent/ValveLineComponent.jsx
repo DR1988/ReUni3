@@ -39,8 +39,9 @@ class ValveLineComponent extends Component<Props> {
         {line.changes.map((el) => {
           const { startTime, endTime, value, crossingValueEnd, crossingValueStart } = el
           const duration = endTime - startTime
+          // console.log(crossingValueEnd, crossingValueStart)
           // console.log('value', value)
-          console.log('el', el)
+          // console.log('el', el)
           // const width = 100 * ((duration + gapTime) / allTime)
           return (
             // <div
