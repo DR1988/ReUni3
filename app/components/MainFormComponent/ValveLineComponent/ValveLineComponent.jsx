@@ -30,7 +30,7 @@ class ValveLineComponent extends Component<Props> {
   }
 
   render() {
-    const { showModal, setChosenValveTime, allTime, line } = this.props
+    const { showModal, setChosenValveTime, allTime, line, chosenElement } = this.props
     const lineName = line.name
     return (
       <div
@@ -40,7 +40,7 @@ class ValveLineComponent extends Component<Props> {
           const { startTime, endTime, value, crossingValueEnd, crossingValueStart } = el
           const duration = endTime - startTime
           // console.log('value', value)
-          // console.log('el', el)
+          console.log('el', el)
           // const width = 100 * ((duration + gapTime) / allTime)
           return (
             // <div
@@ -62,6 +62,7 @@ class ValveLineComponent extends Component<Props> {
                 setChosenValveTime={setChosenValveTime}
                 crossingValueEnd={crossingValueEnd}
                 crossingValueStart={crossingValueStart}
+                chosenElement={chosenElement}
               />
             // </div>
           )

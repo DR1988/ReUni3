@@ -37,6 +37,7 @@ class MainForm extends Component<Props, State> {
   }
   constructor(props: Props) {
     super(props)
+    this.modalCoordinates = null
     this.initialState = {
       chosenElement: {
         wrongSign: '',
@@ -231,7 +232,7 @@ class MainForm extends Component<Props, State> {
 
   componentDidMount() {
     socket.on(socketConfig.makeChange, (data) => {
-      console.log('data', data)
+      // console.log('data', data)
       if (this.state.showEditModal) {
         this.setState({
           ...data,
@@ -743,8 +744,10 @@ class MainForm extends Component<Props, State> {
     })
   }
 
-  showModal = () => {
+  showModal = (e: SyntheticEvent<HTMLDivElement>) => {
+    // console.log(e.currentTarget.getBoundingClientRect())
     if (!this.state.showEditModal) {
+      // this.modalCoordinates = e.currentTarget.getBoundingClientRect()
       this.setState({
         ...this.state,
         showEditModal: true,
@@ -858,6 +861,7 @@ class MainForm extends Component<Props, State> {
       />
       <ModalWithCondition
         condition={showEditModal}
+        // coordinate={this.modalCoordinates}
         render={() => {
           switch (chosenElement.chosenLine.name) {
             case 'ValveLine':

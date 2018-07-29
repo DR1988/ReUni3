@@ -12,9 +12,17 @@ type Props = {
 
 class Modal extends Component<Props> {
   render() {
+    // console.log(this.props)
+    // const { top, bottom, left, right } = this.props.coordinate
+    // console.log(bottom - top)
     return (
       <div className={s.cover}>
-        <div className={s.container}>
+        <div
+          // style={{
+          //   marginTop: (bottom + top) / 2,
+          // }}
+          className={s.container}
+        >
           <div className={s.content}>
             {this.props.render()}
           </div>

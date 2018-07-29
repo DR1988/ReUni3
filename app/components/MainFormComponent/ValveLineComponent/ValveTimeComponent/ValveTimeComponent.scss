@@ -10,12 +10,20 @@
   rgba(171, 193, 197, 1) repeating-linear-gradient(-45deg, transparent, transparent 7.5px,
   rgba(226, 5, 5, 1) 7.5px, rgba(226, 5, 5, 1) 15px);
   display: inline-block;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
+  // overflow: hidden;
+  cursor: pointer;
+  transition: all 0.5s linear, left 0.5s linear;
+}
+
+.timeFormer_content{
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  cursor: pointer;
-  transition: all 0.5s linear, left 0.5s linear;
 }
 
 .timeFormer_sign{
@@ -31,4 +39,14 @@
   //   rgba(171, 193, 197, 1)
   // );
   // background-color: red;
+}
+
+.modal{
+  border: 2px solid red;
+  min-width: 200px;
+  min-height: 400px;
+  background-color: white;
+  position: absolute;
+  z-index: 100;
+  right: calc(100% + 20px);
 }

@@ -37,7 +37,10 @@ class MainFormComponent extends Component<Props, State> {
       addNewValveTime,
       setChosenValveTime,
       start,
+      chosenElement,
     } = this.props
+    // console.log('this.props', this.props)
+
     // console.log(lineFormer[0].changes[1]
     return (
       <div id="mainForm" className={s.mainForm}>
@@ -56,6 +59,7 @@ class MainFormComponent extends Component<Props, State> {
               closeModal={closeModal}
               addNewValveTime={addNewValveTime}
               setChosenValveTime={setChosenValveTime}
+              chosenElement={chosenElement}
             />,
             )}
             <TimeLine

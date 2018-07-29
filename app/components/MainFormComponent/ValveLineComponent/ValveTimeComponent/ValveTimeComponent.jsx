@@ -11,7 +11,7 @@ type Props = {
   lineID: number,
   crossingValueStart: number,
   crossingValueEnd: number,
-  showModal: () => void,
+  showModal: (e: SyntheticEvent<HTMLDivElement>) => void,
   setChosenValveTime: (lineID: number, changeId: number) => void,
 }
 
@@ -19,10 +19,10 @@ class ValveTimeComponent extends Component<Props> {
   constructor(props: Props) { // eslint-disable-line
     super(props)
   }
-  toggleValveTime = (e: Event) => {
+  toggleValveTime = (e: SyntheticEvent<HTMLDivElement>) => {
     e.stopPropagation()
     const { changeId, showModal, setChosenValveTime, lineID } = this.props
-    showModal()
+    showModal(e)
     setChosenValveTime(lineID, changeId)
   }
 
@@ -52,9 +52,17 @@ class ValveTimeComponent extends Component<Props> {
 
   render() {
     const {
-      value, width, startTime, crossingValueStart, crossingValueEnd,
+      value,
+      width,
+      startTime,
+      crossingValueStart,
+      crossingValueEnd,
+      chosenElement,
+      lineID,
+      changeId,
     } = this.props
-    // console.log('crossingValue', crossingValue)
+    // console.log('this.props.changeId ', this.props.changeId)
+    console.log('chosenElement', chosenElement)
     return (
       <div
         className={s.timeFormer}
@@ -72,9 +80,14 @@ class ValveTimeComponent extends Component<Props> {
           width: `${100 * width}%`,
         }}
       >
-        <span className={s.timeFormer_sign}>
-          {value}
-        </span>
+        {/* {changeId === chosenElement.changeId && lineID === chosenElement.chosenLine.id ? <div className={s.modal}>
+          <div></div>
+        </div> : null } */}
+        <div className={s.timeFormer_content}>
+          <span className={s.timeFormer_sign}>
+            {value}
+          </span>
+        </div>
       </div>
     )
   }
