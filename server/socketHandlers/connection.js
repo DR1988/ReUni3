@@ -11,4 +11,7 @@ export default (socket, io) => {
     currentState = msg
     socket.broadcast.emit(socketConfig.makeChange, msg)
   })
+  socket.on(socketConfig.start, (data) => {
+    console.log(data)
+  })
 }

@@ -232,9 +232,16 @@ class MainForm extends Component<Props, State> {
   componentDidMount() {
     socket.on(socketConfig.makeChange, (data) => {
       console.log('data', data)
-      this.setState({
-        ...data,
-      })
+      if (this.state.showEditModal) {
+        this.setState({
+          ...data,
+          showEditModal: true,
+        })
+      } else {
+        this.setState({
+          ...data,
+        })
+      }
     })
   }
 
@@ -244,10 +251,11 @@ class MainForm extends Component<Props, State> {
 
   start = () => {
     const { lineFormer, allTime } = this.state
-    socket.emit(socketConfig.makeChange, {
-      lineFormer,
-      allTime,
-    })
+    socket.emit(socketConfig.start, this.state.lineFormer)
+    // socket.emit(socketConfig.makeChange, {
+    //   lineFormer,
+    //   allTime,
+    // })
   }
 
   setChosenValveTime = (lineID: number, changeId: number): void => {
