@@ -1,10 +1,15 @@
 import { socketConfig } from '../../config'
-import controller from './controller'
+import Controller from './controller'
 
 let currentState = null
 
+let controller = null
+
 export default (socket, io) => {
   console.log('socket id', socket.id, '--------')
+  if (!currentState) {
+    controller = new Controller(socket, io)
+  }
   if (currentState) {
     io.to(socket.id).emit(socketConfig.makeChange, currentState)
   }
@@ -12,6 +17,6 @@ export default (socket, io) => {
     currentState = msg
     socket.broadcast.emit(socketConfig.makeChange, msg)
   })
-  socket.on(socketConfig.start, data => controller(data, socket, io))
-  socket.on(socketConfig.pause, data => controller(data, socket, io))
+  socket.on(socketConfig.start, data => controller.start(data))
+  socket.on(socketConfig.pause, data => controller(socket, io, true))
 }

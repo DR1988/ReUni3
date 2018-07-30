@@ -1,55 +1,71 @@
 import { socketConfig } from '../../config'
 
-export default (data, socket, io) => {
-  const lines = []
-  const velocity = 4
-  let intervalId
-  const linesOfActions = data.lineFormer
-  const counter = { distance: 0, time: 0 }
+export default class Controller {
+  constructor(socket, io) {
+    this.data = null
+    this.socket = socket
+    this.io = io
+    this.pause = false
 
-  console.log('linesOfActions', linesOfActions)
-  // console.log('req.body', linesOfActions[8].changes)
-  // console.log(linesOfActions)
-  for (let j = 0; j < linesOfActions.length; j++) {
-    if (linesOfActions[j].changes.length) {
-      for (let i = 0; i < linesOfActions[j].changes.length; i++) {
-        linesOfActions[j].changes[i].idname = linesOfActions[j].name[0] + linesOfActions[j].id
-        lines.push(linesOfActions[j].changes[i])
+    this.lines = []
+    this.linesOfActions = []
+    this.velocity = 4
+    this.intervalId = null
+    this.counter = { distance: 100, time: 0 }
+
+    this.currentTime = 0
+    this.sendingCommands = ''
+    // this.init()
+  }
+
+  init = (data) => {
+    this.linesOfActions = data.lineFormer
+    this.data = data
+    for (let j = 0; j < this.linesOfActions.length; j++) {
+      if (this.linesOfActions[j].changes.length) {
+        for (let i = 0; i < this.linesOfActions[j].changes.length; i++) {
+          this.linesOfActions[j].changes[i].idname = this.linesOfActions[j].name[0] + this.linesOfActions[j].id
+          this.lines.push(this.linesOfActions[j].changes[i])
+        }
       }
     }
   }
+  // console.log('req.body', linesOfActions[8].changes)
+  // console.log(linesOfActions)
 
   // console.log('lines', lines)
-  let currentTime = 0
-  let sendingCommands = ''
-  const start = () => {
-    intervalId = setInterval(() => {
-      lines.forEach(line => {
-        if (line.startTime === currentTime) {
+  pause = () => {
+    console.log('pause')
+  }
+  start = (data) => {
+    this.init(data)
+    this.intervalId = setInterval(() => {
+      this.lines.forEach((line) => {
+        if (line.startTime === this.currentTime) {
           // console.log(line.idname)
           if (line.idname === 'V0') {
-            sendingCommands = sendingCommands.concat(`${line.idname}Y|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}Y|`)
           }
           if (line.idname === 'V1') {
-            sendingCommands = sendingCommands.concat(`${line.idname}Y|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}Y|`)
           }
           if (line.idname === 'V2') {
-            sendingCommands = sendingCommands.concat(`${line.idname}Y|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}Y|`)
           }
           if (line.idname === 'V3') {
-            sendingCommands = sendingCommands.concat(`${line.idname}Y|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}Y|`)
           }
           if (line.idname === 'V4') {
-            sendingCommands = sendingCommands.concat(`${line.idname}Y|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}Y|`)
           }
           if (line.idname === 'V5') {
-            sendingCommands = sendingCommands.concat(`${line.idname}Y|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}Y|`)
           }
           if (line.idname === 'V6') {
-            sendingCommands = sendingCommands.concat(`${line.idname}Y|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}Y|`)
           }
           if (line.idname === 'V7') {
-            sendingCommands = sendingCommands.concat(`${line.idname}Y|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}Y|`)
           }
           if (line.idname === 'R8') {
             // console.log('RPM line sendind', line.idname, line.value)
@@ -70,45 +86,46 @@ export default (data, socket, io) => {
             // console.log('intervalId2', intervalId2)
             // clearInterval(intervalId)
             // }
-            sendingCommands = sendingCommands.concat(`${line.idname}${line.value}|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}${line.value}|`)
           }
           if (line.idname === 'T9') {
-            sendingCommands = sendingCommands.concat(`${line.idname}${line.value}|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}${line.value}|`)
             // console.log('temperature line sending', line.idname, line.value)
           }
-        } else if (line.endTime === currentTime) {
+        } else if (line.endTime === this.currentTime) {
           if (line.idname === 'R8') {
-            sendingCommands = sendingCommands.concat(`${line.idname}0|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}0|`)
             // console.log(line.idname, 0)
           }
           if (line.idname === 'T9') {
-            sendingCommands = sendingCommands.concat(`${line.idname}0|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}0|`)
             // console.log(line.idname, 0)
           }
           if (/V\d+/.test(line.idname)) {
             // console.log('asdasdadasadasd')
-            sendingCommands = sendingCommands.concat(`${line.idname}N|`)
+            this.sendingCommands = this.sendingCommands.concat(`${line.idname}N|`)
           }
         }
       })
-      if (sendingCommands) {
-        console.log('sendingCommands = ', sendingCommands)
-        // serialPort.write(`${sendingCommands}\n`)
-        sendingCommands = ''
+      if (this.sendingCommands) {
+        console.log('this.sendingCommands = ', this.sendingCommands)
+        // serialPort.write(`${this.sendingCommands}\n`)
+        this.sendingCommands = ''
       }
-      if (currentTime >= data.allTime) {
-        clearInterval(intervalId)
+      if (this.currentTime >= this.data.allTime) {
+        clearInterval(this.intervalId)
       }
-      ++currentTime
+      ++this.currentTime
       // console.log(currentTime)
       // if (currentTime % 10 === 0) {
       //   // console.log('currentTime', currentTime)
       // }
-    }, 1000 / velocity)
+    }, 1000 / this.velocity)
+    this.counter.time = data.allTime / this.velocity
+    this.io.emit(socketConfig.start, this.counter)
   }
-  start()
-  counter.distance = 100
-  counter.time = data.allTime / velocity
-  io.emit(socketConfig.start, counter)
-  console.log('counter', counter.distance, counter.time)
+  // start()
+  // counter.distance = 100
+  // counter.time = data.allTime / velocity
+  // console.log('counter', counter.distance, counter.time)
 }
