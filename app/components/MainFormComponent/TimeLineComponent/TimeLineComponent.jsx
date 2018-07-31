@@ -35,7 +35,7 @@ const TimeLineComponent = (props) => {
     </div>
     <div
       className={s['time-presenter']}
-      style={{ left: `${(props.distance )}%`, transition: `left ${props.time}s linear` }}
+      style={{ left: `${props.distance}%`, transition: `left ${props.time}s linear` }}
       // style={{ left: props.distance * scale - 13, transition: `left ${props.time}s linear` }}
     >
       <div className={s.line} />

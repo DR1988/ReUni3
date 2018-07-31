@@ -251,6 +251,20 @@ class MainForm extends Component<Props, State> {
         time,
       })
     })
+    socket.on(socketConfig.pause, (data) => {
+      console.log('data', data)
+      const { time } = this.state
+      this.setState({
+        distance: 100 * data.currentTime / time
+      })
+    })
+    socket.on(socketConfig.stop, (data) => {
+      const { distance, time } = data
+      this.setState({
+        distance,
+        time,
+      })
+    })
   }
 
   componentWillUnmount() {
@@ -858,6 +872,10 @@ class MainForm extends Component<Props, State> {
     socket.emit(socketConfig.pause)
   }
 
+  stop = () => {
+    socket.emit(socketConfig.stop)
+  }
+
   render() {
     const { chosenElement, lineFormer, showEditModal } = this.state
     const { changeId, chosenLine } = chosenElement
@@ -870,6 +888,7 @@ class MainForm extends Component<Props, State> {
         resetState={this.resetState}
         start={this.start}
         pause={this.pause}
+        stop={this.stop}
         showModal={this.showModal}
         addNewValveTime={this.addNewValveTime}
         setChosenValveTime={this.setChosenValveTime}

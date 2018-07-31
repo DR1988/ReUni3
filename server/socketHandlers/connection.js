@@ -18,5 +18,6 @@ export default (socket, io) => {
     socket.broadcast.emit(socketConfig.makeChange, msg)
   })
   socket.on(socketConfig.start, data => controller.start(data))
-  socket.on(socketConfig.pause, data => controller(socket, io, true))
+  socket.on(socketConfig.pause, () => controller.pause())
+  socket.on(socketConfig.stop, () => controller.stop())
 }

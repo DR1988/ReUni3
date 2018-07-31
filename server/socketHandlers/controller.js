@@ -5,13 +5,12 @@ export default class Controller {
     this.data = null
     this.socket = socket
     this.io = io
-    this.pause = false
 
     this.lines = []
     this.linesOfActions = []
-    this.velocity = 4
+    this.velocity = 10
     this.intervalId = null
-    this.counter = { distance: 100, time: 0 }
+    this.counter = { distance: 0, time: 0 }
 
     this.currentTime = 0
     this.sendingCommands = ''
@@ -21,6 +20,7 @@ export default class Controller {
   init = (data) => {
     this.linesOfActions = data.lineFormer
     this.data = data
+    this.lines = []
     for (let j = 0; j < this.linesOfActions.length; j++) {
       if (this.linesOfActions[j].changes.length) {
         for (let i = 0; i < this.linesOfActions[j].changes.length; i++) {
@@ -36,9 +36,23 @@ export default class Controller {
   // console.log('lines', lines)
   pause = () => {
     console.log('pause')
+    clearInterval(this.intervalId)
+    this.io.emit(socketConfig.pause, { currentTime: this.currentTime / this.velocity })
+  }
+
+  stop = () => {
+    console.log('stop')
+    clearInterval(this.intervalId)
+    this.currentTime = 0
+    this.counter = {
+      distance: 0,
+      time: 1,
+    }
+    this.io.emit(socketConfig.stop, this.counter)
   }
   start = (data) => {
     this.init(data)
+    this.counter.distance = 100
     this.intervalId = setInterval(() => {
       this.lines.forEach((line) => {
         if (line.startTime === this.currentTime) {
@@ -113,6 +127,7 @@ export default class Controller {
         this.sendingCommands = ''
       }
       if (this.currentTime >= this.data.allTime) {
+        this.currentTime = 0
         clearInterval(this.intervalId)
       }
       ++this.currentTime
@@ -121,7 +136,7 @@ export default class Controller {
       //   // console.log('currentTime', currentTime)
       // }
     }, 1000 / this.velocity)
-    this.counter.time = data.allTime / this.velocity
+    this.counter.time = (data.allTime - this.currentTime) / this.velocity
     this.io.emit(socketConfig.start, this.counter)
   }
   // start()
