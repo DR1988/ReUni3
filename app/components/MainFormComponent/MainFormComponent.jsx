@@ -53,17 +53,19 @@ class MainFormComponent extends Component<Props, State> {
         <section className={s['form-container']}>
           <LineDescriptionComponent lines={lineFormer} />
           <section className={s['lines-keeper']}>
-            {lineFormer.map(elem => <ValveLineComponent
-              key={elem.id}
-              line={elem}
-              allTime={allTime}
-              showModal={showModal}
-              closeModal={closeModal}
-              addNewValveTime={addNewValveTime}
-              setChosenValveTime={setChosenValveTime}
-              chosenElement={chosenElement}
-            />,
-            )}
+            <div id="mainFormContainer">
+              {lineFormer.map(elem => <ValveLineComponent
+                key={elem.id}
+                line={elem}
+                allTime={allTime}
+                showModal={showModal}
+                closeModal={closeModal}
+                addNewValveTime={addNewValveTime}
+                setChosenValveTime={setChosenValveTime}
+                chosenElement={chosenElement}
+              />,
+              )}
+            </div>
             <TimeLine
               distance={distance}
               time={time}

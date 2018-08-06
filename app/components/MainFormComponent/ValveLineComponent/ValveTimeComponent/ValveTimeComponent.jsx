@@ -15,14 +15,81 @@ type Props = {
   setChosenValveTime: (lineID: number, changeId: number) => void,
 }
 
-class ValveTimeComponent extends Component<Props> {
+type State = {
+  window: {
+    body: {
+      x: number,
+      y: number,
+      side: 'left' | 'right',
+      position: 'top' | 'bottom',
+    },
+    arrow: {
+      x: number,
+      y: number,
+    }
+  }
+}
+class ValveTimeComponent extends Component<Props, State> {
   constructor(props: Props) { // eslint-disable-line
     super(props)
+    this.state = {
+      window: {
+        body: {
+          x: 0,
+          y: 0,
+          side: 'left',
+          position: 'top',
+        },
+        arrow: {
+          x: 0,
+          y: 0,
+        },
+      },
+    }
   }
   toggleValveTime = (e: SyntheticEvent<HTMLDivElement>) => {
     e.stopPropagation()
     const { changeId, showModal, setChosenValveTime, lineID } = this.props
-    showModal(e)
+    // showModal(e)
+    let formLeft
+    let formRight
+    let formTop
+    let formBottom
+    let position = this.state.window.body.position
+    let side = this.state.window.body.side
+    const mainForm = document.getElementById('mainFormContainer')
+    console.log(mainForm)
+    if (mainForm) {
+      ({ left: formLeft, right: formRight, top: formTop, bottom: formBottom } = mainForm.getBoundingClientRect())
+    }
+    // console.log(formLeft, formRight, formTop, formBottom)
+    const { left, right, top, bottom } = e.currentTarget.getBoundingClientRect()
+    // console.log(left, right, top, bottom)
+    const valveWidth = right - left
+    const valveHeight = bottom - top
+    if (formRight - right + valveWidth < 400) { // window doesn't fit to form
+      side = 'right'
+    }
+    console.log(formBottom - bottom - 20)
+    console.log(formBottom - bottom - 20 < 250)
+    if (formBottom - bottom - 20 < 250) {
+      position = 'bottom'
+    }
+    this.setState({
+      ...this.state,
+      window: {
+        ...this.state.window,
+        body: {
+          ...this.state.window.body,
+          side,
+          position,
+        },
+        arrow: {
+          ...this.state.window.arrow,
+          x: valveWidth / 2,
+        },
+      },
+    })
     setChosenValveTime(lineID, changeId)
   }
 
@@ -63,6 +130,8 @@ class ValveTimeComponent extends Component<Props> {
     } = this.props
     // console.log('this.props.changeId ', this.props.changeId)
     // console.log('chosenElement', chosenElement)
+    const { side, position } = this.state.window.body
+    const { x } = this.state.window.arrow
     return (
       <div
         className={s.timeFormer}
@@ -80,9 +149,11 @@ class ValveTimeComponent extends Component<Props> {
           width: `${100 * width}%`,
         }}
       >
-        {/* {changeId === chosenElement.changeId && lineID === chosenElement.chosenLine.id ? <div className={s.modal}>
-          <div></div>
-        </div> : null } */}
+        {changeId === chosenElement.changeId && lineID === chosenElement.chosenLine.id ?
+          <div className={s.modal} style={{ [side]: 0, [position]: 'calc(100% + 20px)' }}>
+            <div></div>
+            <div style={{ [side]: `${x}px` }} className={s[`arrow_${position}`]}></div>
+          </div> : null }
         <div className={s.timeFormer_content}>
           <span className={s.timeFormer_sign}>
             {value}

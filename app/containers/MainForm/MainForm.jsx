@@ -178,7 +178,7 @@ class MainForm extends Component<Props, State> {
         name: 'ValveLine',
         id: 3,
         shortName: 'GV4',
-        changes: [],
+        changes: [{ startTime: 240, endTime: 290, changeId: 0, duration: 50, crossingValueEnd: NaN, crossingValueStart: NaN }],
       },
       {
         name: 'ValveLine',

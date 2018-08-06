@@ -43,10 +43,30 @@
 
 .modal{
   border: 2px solid red;
-  min-width: 200px;
-  min-height: 400px;
+  width: 400px;
+  height: 250px;
   background-color: white;
   position: absolute;
   z-index: 100;
-  right: calc(100% + 20px);
+  // right: 0%;
+  // top: calc(100% + 20px);
+  .arrow_bottom {
+    width: 0; 
+    height: 0; 
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 20px solid #f00;
+    position: absolute;
+    top: 100%;
+  }
+  .arrow_top {
+    width: 0;
+    height: 0;
+    position: absolute;
+    bottom: 100%;
+    // left: 50%;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 20px solid red;
+  }
 }
