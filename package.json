@@ -11,7 +11,8 @@
     "fix": "eslint . --ext .js,.jsx --fix",
     "slate": "rimraf node_modules && npm install",
     "create-component": "babel-node bin/generators/component",
-    "create-container": "babel-node bin/generators/container"
+    "create-container": "babel-node bin/generators/container",
+    "serial": "babel-node ./server/serial.js"
   },
   "author": "",
   "license": "ISC",
@@ -44,10 +45,12 @@
     "react-redux": "^5.0.4",
     "react-router": "^4.1.1",
     "react-router-dom": "^4.1.1",
+    "recharts": "^1.3.5",
     "redux": "^3.6.0",
     "redux-logger": "^3.0.1",
     "redux-saga": "^0.14.7",
     "sass-loader": "^6.0.3",
+    "serialport": "^7.0.2",
     "shelljs": "^0.7.7",
     "shortid": "^2.2.8",
     "socket.io": "^2.1.1",

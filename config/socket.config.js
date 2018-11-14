@@ -3,4 +3,5 @@ export default {
   makeChange: 'MAKE_CHANGE',
   pause: 'PAUSE',
   stop: 'STOP',
+  rpmChange: 'rpmChange',
 }

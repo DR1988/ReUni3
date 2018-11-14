@@ -6,6 +6,7 @@ import webpackMidlleware from './middlewares/webpack'
 // import renderMiddleware from './middlewares/renderHTML'
 import staticMiddleware from './middlewares/static'
 import connection from './socketHandlers/connection'
+import serial from './serial'
 
 const app = express()
 const http = require('http').Server(app)
@@ -20,7 +21,10 @@ app.use(staticMiddleware)
 // app.use(renderMiddleware)
 const io = socket(http)
 
-io.on('connection', s => connection(s, io))
+io.on('connection', s => {
+  connection(s, io)
+  serial(s, io)
+})
 
 app.use(express.static(path.resolve(__dirname, './../')))
 app.get(/.*/, (req, res) =>

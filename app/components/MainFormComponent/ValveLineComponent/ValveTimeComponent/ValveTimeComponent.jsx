@@ -80,9 +80,10 @@ class ValveTimeComponent extends Component<Props> {
           width: `${100 * width}%`,
         }}
       >
-        {/* {changeId === chosenElement.changeId && lineID === chosenElement.chosenLine.id ? <div className={s.modal}>
-          <div></div>
-        </div> : null } */}
+        {/* {changeId === chosenElement.changeId && lineID === chosenElement.chosenLine.id ?
+          <div className={s.modal}>
+            <div>{chosenElement.changeId}</div>
+          </div> : null } */}
         <div className={s.timeFormer_content}>
           <span className={s.timeFormer_sign}>
             {value}
