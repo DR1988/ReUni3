@@ -1,21 +1,22 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'Recharts'
-import io from 'socket.io-client'
+import { LineChart, ReferenceArea, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'Recharts'
 
 import { socketConfig } from '../../../config'
 
-const socket = io(`${location.origin}`)
-
-const arrays = [
-  { name: 'Page A', uv: 4000, pv: 2400, amt: 2400 },
-  { name: 'Page B', uv: 3000, pv: 1398, amt: 2210 },
-  { name: 'Page C', uv: 2000, pv: 9800, amt: 2290 },
-  { name: 'Page D', uv: 2780, pv: 3908, amt: 2000 },
-  { name: 'Page E', uv: 1890, pv: 4800, amt: 2181 },
-  { name: 'Page F', uv: 2390, pv: 3800, amt: 2500 },
-  { name: 'Page G', uv: 3490, pv: 4300, amt: 2100 },
-]
+function randomIntFromInterval(min, max) // min and max included
+{
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+// const arrays = [
+//   { name: 'Page A', uv: 4000, pv: 2400, amt: 2400 },
+//   { name: 'Page B', uv: 3000, pv: 1398, amt: 2210 },
+//   { name: 'Page C', uv: 2000, pv: 9800, amt: 2290 },
+//   { name: 'Page D', uv: 2780, pv: 3908, amt: 2000 },
+//   { name: 'Page E', uv: 1890, pv: 4800, amt: 2181 },
+//   { name: 'Page F', uv: 2390, pv: 3800, amt: 2500 },
+//   { name: 'Page G', uv: 3490, pv: 4300, amt: 2100 },
+// ]
 
 class Graphs extends Component {
   static propTypes = {
@@ -24,8 +25,40 @@ class Graphs extends Component {
 
   constructor(props) {
     super(props)
-
+    this.count = 0
     this.state = {
+      rmpSetValues: [
+        { timeStamp: 0, 'RPM set value': 500 },
+        { timeStamp: 1, 'RPM current value': 520 },
+        { timeStamp: 2, 'RPM current value': 480 },
+        { timeStamp: 3, 'RPM current value': 510 },
+        { timeStamp: 4, 'RPM current value': 511 },
+        { timeStamp: 5, 'RPM current value': 491 },
+        { timeStamp: 6, 'RPM current value': 498 },
+        { timeStamp: 7, 'RPM current value': 501 },
+        { timeStamp: 8, 'RPM current value': 511 },
+        { timeStamp: 9, 'RPM current value': 525 },
+        { timeStamp: 10, 'RPM current value': 505 },
+        { timeStamp: 11, 'RPM current value': 497 },
+        { timeStamp: 12, 'RPM current value': 491 },
+        { timeStamp: 13, 'RPM current value': 511 },
+        { timeStamp: 14, 'RPM current value': 522 },
+        { timeStamp: 15, 'RPM current value': 503 },
+        { timeStamp: 50, 'RPM set value': 500 },
+        // { timeStamp: 50, 'RPM set value': 0 },
+        // { timeStamp: 100, 'RPM set value': 0 },
+        { timeStamp: 100, 'RPM set value': 2000 },
+        { timeStamp: 150, 'RPM set value': 2000 },
+        { timeStamp: 150 },
+        { timeStamp: 200, 'RPM set value': 1500 },
+        { timeStamp: 250, 'RPM set value': 1500 },
+        { timeStamp: 250 },
+        { timeStamp: 300, 'RPM set value': 1000 },
+        { timeStamp: 350, 'RPM set value': 1000 },
+        { timeStamp: 350 },
+      ],
+      graphTicks: [],
+      allTime: 1,
       counts: 0,
       rmpValues: [/* {
         name: 'RPM',
@@ -35,7 +68,7 @@ class Graphs extends Component {
   }
 
   componentDidMount() {
-    socket.on(socketConfig.rpmChange, (data) => {
+    this.props.socket.on(socketConfig.rpmChange, (data) => {
       const { rmpValue } = data
       // console.log('datas', data)
       this.setState({
@@ -47,35 +80,134 @@ class Graphs extends Component {
         // rmpValues: [...this.state.rmpValues, rmpValue],
       })
     })
-    // this.interval = setInterval(this.increaseCounts, 1000)
+
+    this.props.socket.on(socketConfig.start, (data, form) => {
+      console.log(form);
+      const { allTime } = form
+      const RPMchanges = form.lineFormer.filter(el => el.shortName === 'RPM')[0].changes
+      console.log('RPMchanges', RPMchanges)
+      const graphTicks = RPMchanges.reduce((acc, cur) => {
+        acc.push(cur.startTime, cur.endTime)
+        return acc
+      }, [])
+      const rmpSetValues = RPMchanges.reduce((acc, cur) => {
+        acc.push({
+          timeStamp: cur.startTime,
+          "RPM set value": cur.value,
+        })
+        acc.push({
+          timeStamp: cur.endTime,
+          "RPM set value": cur.value,
+        })
+        acc.push({
+          timeStamp: cur.endTime,
+        })
+        return acc
+      }, [])
+      console.log('rmpSetValues', rmpSetValues);
+      const RPMcurrentValue = rmpSetValues.filter(el => el['RPM set value'])
+      const stepValues = []
+      RPMcurrentValue.reduce((acc, curr) => {
+        if (curr['RPM set value'] === acc['RPM set value']) {
+          stepValues.push({
+            ts: acc.timeStamp,
+            tf: curr.timeStamp,
+            setValue: curr['RPM set value'],
+          })
+        }
+        return curr
+      })
+      this.setState({
+        allTime,
+        graphTicks,
+        rmpSetValues,
+        stepValues,
+      })
+      this.interval = setInterval(this.increaseCounts, 1000)
+    })
   }
 
   componentWillUnmount() {
     clearInterval(this.interval)
   }
 
-  // increaseCounts = () => {
-  //   this.setState({
-  //     counts: this.state.counts += 1,
-  //   })
-  // }
+  increaseCounts = () => {
+    const { stepValues } = this.state
+    let currentValue
+    const startTime = stepValues.filter(el => this.count >= el.ts && this.count <= el.tf)[0]
+    if (startTime) {
+      currentValue = randomIntFromInterval(startTime.setValue - 50, startTime.setValue + 50)
+      const count = [{ timeStamp: this.count, 'RPM current value': currentValue }]
+      this.setState({
+        rmpValues: this.state.rmpValues.concat(count),
+      })
+    } else {
+      this.setState({
+        rmpValues: this.state.rmpValues.concat([
+          { timeStamp: this.count, 'RPM current value': 0 },
+        ]),
+      })
+    }
+    this.count++
+    // this.setState({
+    //   counts: this.state.counts += 1,
+    // })
+    // RPM current value
+  }
 
   render() {
-    const { rmpValues } = this.state
+    const { rmpValues, graphTicks, allTime, rmpSetValues, stepValues } = this.state
+    console.log('rmpValues', rmpValues)
+    // const RPMcurrentValue = rmpSetValues.filter(el => el['RPM set value'])
+    // console.log('stepValues', stepValues)
+    // console.log('graphTicks', graphTicks)
+    // console.log('rmpSetValues', rmpSetValues);
     // console.log('rmpValues', rmpValues);
     return (<div>{this.state.counts}
-      <LineChart
-        width={600} height={300} data={rmpValues}
-        // margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      <ResponsiveContainer
+        minWidth={800}
+        width="100%"
+        height={400}
       >
-        <XAxis dataKey="name" />
-        <YAxis />
-        <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="rpm" stroke="#8884d8" activeDot={{ r: 8 }} />
-        {/* <Line type="monotone" dataKey="uv" stroke="#82ca9d" /> */}
-      </LineChart>
+        <LineChart
+          data={rmpValues}
+        // width={600} height={300} data={rmpValues}
+        // margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        >
+          <XAxis
+            // scale="ordinal"
+            type="number"
+            ticks={graphTicks}
+            domain={[0, allTime]}
+            dataKey="timeStamp"
+          />
+          <YAxis dataKey="RPM set value" yAxisId="setValue" />
+          <YAxis domain={[0, 2000]} hide yAxisId="currentValue" />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          {stepValues && stepValues.map(el =>
+            <ReferenceArea
+              key={el.ts}
+              yAxisId="setValue"
+              x1={el.ts}
+              x2={el.tf}
+              y1={el.setValue}
+              y2={el.setValue - 2}
+              stroke="green"
+              strokeOpacity={1}
+            />,
+          )}
+          <Line
+            dot={false}
+            type="monotone"
+            dataKey="RPM current value"
+            stroke="red"
+            strokeWidth={3}
+            yAxisId="currentValue"
+          />
+        </LineChart>
+      </ResponsiveContainer >
     </div>)
   }
 }

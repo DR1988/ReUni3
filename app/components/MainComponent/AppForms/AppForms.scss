@@ -5,3 +5,15 @@
 .hide{
   display: none;
 }
+.container {
+  display: flex;
+}
+.showSide{
+  width: 100%;
+  overflow: hidden;
+}
+
+.hideSide{
+  width: 0%;
+  overflow: hidden;
+}

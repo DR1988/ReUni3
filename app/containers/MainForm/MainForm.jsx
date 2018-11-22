@@ -3,7 +3,6 @@ import React, { Component } from 'react' // eslint-disable-line
 // import PropTypes from 'prop-types'
 import cloneDeep from 'lodash/cloneDeep'
 import shortid from 'shortid'
-import io from 'socket.io-client'
 
 import MainFormComponent from '../../components/MainFormComponent'
 import type { ValveLineType, Change, ChosenElement, LineFormer } from './MainFormTypes'
@@ -17,8 +16,6 @@ import TempModal from '../../components/Modal/TempModal'
 
 import { withCondition } from '../../components/HOC'
 import { socketConfig } from '../../../config'
-
-const socket = io(`${location.origin}`)
 
 const ModalWithCondition = withCondition(props => <Modal {...props} />)
 
@@ -210,10 +207,40 @@ class MainForm extends Component<Props, State> {
         id: 8,
         changes: [
           {
+            startTime: 0,
+            endTime: 50,
+            value: 500,
+            changeId: 0,
+            duration: 50,
+            waitForValue: true,
+            crossingValueEnd: NaN,
+            crossingValueStart: NaN,
+          },
+          {
+            startTime: 100,
+            endTime: 150,
+            value: 2000,
+            changeId: 1,
+            duration: 50,
+            waitForValue: true,
+            crossingValueEnd: NaN,
+            crossingValueStart: NaN,
+          },
+          {
+            startTime: 200,
+            endTime: 250,
+            value: 1500,
+            changeId: 2,
+            duration: 50,
+            waitForValue: true,
+            crossingValueEnd: NaN,
+            crossingValueStart: NaN,
+          },
+          {
             startTime: 300,
             endTime: 350,
             value: 1000,
-            changeId: 0,
+            changeId: 3,
             duration: 50,
             waitForValue: true,
             crossingValueEnd: NaN,
@@ -231,7 +258,7 @@ class MainForm extends Component<Props, State> {
   }
 
   componentDidMount() {
-    socket.on(socketConfig.makeChange, (data) => {
+    this.props.socket.on(socketConfig.makeChange, (data) => {
       // console.log('data', data)
       if (this.state.showEditModal) {
         this.setState({
@@ -244,21 +271,21 @@ class MainForm extends Component<Props, State> {
         })
       }
     })
-    socket.on(socketConfig.start, (data) => {
+    this.props.socket.on(socketConfig.start, (data) => {
       const { distance, time } = data
       this.setState({
         distance,
         time,
       })
     })
-    socket.on(socketConfig.pause, (data) => {
+    this.props.socket.on(socketConfig.pause, (data) => {
       console.log('data', data)
       const { time } = this.state
       this.setState({
         distance: 100 * data.currentTime / time
       })
     })
-    socket.on(socketConfig.stop, (data) => {
+    this.props.socket.on(socketConfig.stop, (data) => {
       const { distance, time } = data
       this.setState({
         distance,
@@ -268,16 +295,16 @@ class MainForm extends Component<Props, State> {
   }
 
   componentWillUnmount() {
-    socket.removeAllListeners()
+    this.props.socket.removeAllListeners()
   }
 
   start = () => {
     const { lineFormer, allTime } = this.state
-    socket.emit(socketConfig.start, {
+    this.props.socket.emit(socketConfig.start, {
       lineFormer,
       allTime,
     })
-    // socket.emit(socketConfig.makeChange, {
+    // this.props.socket.emit(socketConfig.makeChange, {
     //   lineFormer,
     //   allTime,
     // })
@@ -380,7 +407,7 @@ class MainForm extends Component<Props, State> {
       showEditModal: false,
       chosenElement: newChosenElement,
     }
-    socket.emit(socketConfig.makeChange, newState)
+    this.props.socket.emit(socketConfig.makeChange, newState)
     this.setState({ ...newState })
   }
 
@@ -865,15 +892,15 @@ class MainForm extends Component<Props, State> {
   }
 
   emitChanges = () => {
-    socket.emit(socketConfig.makeChange, { ...this.state, showEditModal: false })
+    this.props.socket.emit(socketConfig.makeChange, { ...this.state, showEditModal: false })
   }
 
   pause = () => {
-    socket.emit(socketConfig.pause)
+    this.props.socket.emit(socketConfig.pause)
   }
 
   stop = () => {
-    socket.emit(socketConfig.stop)
+    this.props.socket.emit(socketConfig.stop)
   }
 
   render() {

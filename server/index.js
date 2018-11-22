@@ -23,6 +23,7 @@ const io = socket(http)
 
 io.on('connection', s => {
   connection(s, io)
+  // TODO: check for every connection serial creation
   serial(s, io)
 })
 

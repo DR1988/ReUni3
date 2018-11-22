@@ -8,7 +8,7 @@ export default class Controller {
 
     this.lines = []
     this.linesOfActions = []
-    this.velocity = 10
+    this.velocity = 2
     this.intervalId = null
     this.counter = { distance: 0, time: 0 }
 
@@ -137,7 +137,7 @@ export default class Controller {
       // }
     }, 1000 / this.velocity)
     this.counter.time = (data.allTime - this.currentTime) / this.velocity
-    this.io.emit(socketConfig.start, this.counter)
+    this.io.emit(socketConfig.start, this.counter, data)
   }
   // start()
   // counter.distance = 100
