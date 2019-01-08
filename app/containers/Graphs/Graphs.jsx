@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { LineChart, ReferenceArea, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'Recharts'
 
 import { socketConfig } from '../../../config'
+import Graph from '../../components/common/graphs/Mygraph'
 
 function randomIntFromInterval(min, max) // min and max included
 {
@@ -60,6 +61,7 @@ class Graphs extends Component {
       graphTicks: [],
       allTime: 1,
       counts: 0,
+      commonArray: [],
       rmpValues: [/* {
         name: 'RPM',
         uv: 0,
@@ -82,7 +84,7 @@ class Graphs extends Component {
     })
 
     this.props.socket.on(socketConfig.start, (data, form) => {
-      console.log(form);
+      console.log('form', form);
       const { allTime } = form
       const RPMchanges = form.lineFormer.filter(el => el.shortName === 'RPM')[0].changes
       console.log('RPMchanges', RPMchanges)
@@ -90,6 +92,7 @@ class Graphs extends Component {
         acc.push(cur.startTime, cur.endTime)
         return acc
       }, [])
+      // console.log('graphTicks', graphTicks)
       const rmpSetValues = RPMchanges.reduce((acc, cur) => {
         acc.push({
           timeStamp: cur.startTime,
@@ -99,9 +102,9 @@ class Graphs extends Component {
           timeStamp: cur.endTime,
           "RPM set value": cur.value,
         })
-        acc.push({
-          timeStamp: cur.endTime,
-        })
+        // acc.push({
+        //   timeStamp: cur.endTime,
+        // })
         return acc
       }, [])
       console.log('rmpSetValues', rmpSetValues);
@@ -117,13 +120,14 @@ class Graphs extends Component {
         }
         return curr
       })
+      console.log('stepValues', stepValues)
       this.setState({
         allTime,
         graphTicks,
         rmpSetValues,
         stepValues,
       })
-      this.interval = setInterval(this.increaseCounts, 1000)
+      this.interval = setInterval(this.increaseCounts, 20)
     })
   }
 
@@ -132,23 +136,48 @@ class Graphs extends Component {
   }
 
   increaseCounts = () => {
-    const { stepValues } = this.state
+    const { stepValues, rmpSetValues, rmpValues } = this.state
     let currentValue
+    if (this.count === 0 ) console.log(rmpSetValues)
     const startTime = stepValues.filter(el => this.count >= el.ts && this.count <= el.tf)[0]
+    // console.log('startTime', startTime)
     if (startTime) {
+      // const setValue = rmpSetValues.find(el => el.timeStamp === this.count)
+      // console.log('setValue', setValue)
+      // console.log('rmpValues', rmpValues)
       currentValue = randomIntFromInterval(startTime.setValue - 50, startTime.setValue + 50)
-      const count = [{ timeStamp: this.count, 'RPM current value': currentValue }]
+      const count = { timeStamp: this.count, 'RPM current value': currentValue }
+      // console.log('rmpSetValues', rmpSetValues)
+      const index = rmpSetValues.findIndex(el => el.timeStamp === this.count)
+      // console.log(this.count)
+      let array
+      if (index !== -1) {
+        const value = { ...rmpSetValues[index], ...count }
+        console.log('value', value)
+        array = [{ ...rmpSetValues[index], ...value }]
+        console.log('commonArray', this.state.commonArray)
+      } else {
+        array = [count]
+      }
       this.setState({
-        rmpValues: this.state.rmpValues.concat(count),
+        commonArray: this.state.commonArray.concat(array),
+        // rmpSetValues: rmpSetValues.concat([count]),
+        rmpValues: this.state.rmpValues.concat([count]),
       })
     } else {
       this.setState({
+        commonArray: this.state.commonArray.concat([
+          { timeStamp: this.count, 'RPM current value': 0 },
+        ]),
         rmpValues: this.state.rmpValues.concat([
           { timeStamp: this.count, 'RPM current value': 0 },
         ]),
       })
     }
     this.count++
+    if (this.count >= this.state.allTime) {
+      clearInterval(this.interval)
+    }
     // this.setState({
     //   counts: this.state.counts += 1,
     // })
@@ -156,21 +185,24 @@ class Graphs extends Component {
   }
 
   render() {
-    const { rmpValues, graphTicks, allTime, rmpSetValues, stepValues } = this.state
-    console.log('rmpValues', rmpValues)
+    const { rmpValues, graphTicks, allTime, rmpSetValues, stepValues, commonArray } = this.state
+    // console.log('rmpValues', rmpValues)
+    // console.log('stepValues', stepValues)
+    // console.log('rmpSetValues', rmpSetValues)
     // const RPMcurrentValue = rmpSetValues.filter(el => el['RPM set value'])
     // console.log('stepValues', stepValues)
     // console.log('graphTicks', graphTicks)
     // console.log('rmpSetValues', rmpSetValues);
     // console.log('rmpValues', rmpValues);
-    return (<div>{this.state.counts}
-      <ResponsiveContainer
+    return (<div>
+    {/* {this.state.counts} */}
+      {/* <ResponsiveContainer
         minWidth={800}
         width="100%"
         height={400}
       >
         <LineChart
-          data={rmpValues}
+          data={commonArray}
         // width={600} height={300} data={rmpValues}
         // margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
@@ -181,8 +213,8 @@ class Graphs extends Component {
             domain={[0, allTime]}
             dataKey="timeStamp"
           />
-          <YAxis dataKey="RPM set value" yAxisId="setValue" />
-          <YAxis domain={[0, 2000]} hide yAxisId="currentValue" />
+          <YAxis dataKey="RPM set value" hide yAxisId="setValue" />
+          <YAxis dataKey="RPM set value" domain={[0, 2000]} yAxisId="currentValue" />
           <CartesianGrid strokeDasharray="3 3" />
           <Tooltip />
           <Legend />
@@ -199,6 +231,7 @@ class Graphs extends Component {
             />,
           )}
           <Line
+            isAnimationActive={false}
             dot={false}
             type="monotone"
             dataKey="RPM current value"
@@ -207,7 +240,10 @@ class Graphs extends Component {
             yAxisId="currentValue"
           />
         </LineChart>
-      </ResponsiveContainer >
+      </ResponsiveContainer > */}
+      <Graph
+        
+      />
     </div>)
   }
 }
