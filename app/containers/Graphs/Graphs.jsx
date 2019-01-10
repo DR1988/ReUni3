@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { LineChart, ReferenceArea, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'Recharts'
@@ -138,7 +139,7 @@ class Graphs extends Component {
   increaseCounts = () => {
     const { stepValues, rmpSetValues, rmpValues } = this.state
     let currentValue
-    if (this.count === 0 ) console.log(rmpSetValues)
+    if (this.count === 0) console.log(rmpSetValues)
     const startTime = stepValues.filter(el => this.count >= el.ts && this.count <= el.tf)[0]
     // console.log('startTime', startTime)
     if (startTime) {
@@ -195,8 +196,8 @@ class Graphs extends Component {
     // console.log('rmpSetValues', rmpSetValues);
     // console.log('rmpValues', rmpValues);
     return (<div>
-    {/* {this.state.counts} */}
-      {/* <ResponsiveContainer
+      {/* {this.state.counts} */}
+      <ResponsiveContainer
         minWidth={800}
         width="100%"
         height={400}
@@ -240,10 +241,8 @@ class Graphs extends Component {
             yAxisId="currentValue"
           />
         </LineChart>
-      </ResponsiveContainer > */}
-      <Graph
-        
-      />
+      </ResponsiveContainer >
+      <Graph />
     </div>)
   }
 }

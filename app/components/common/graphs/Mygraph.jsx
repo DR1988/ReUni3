@@ -1,18 +1,43 @@
 // @flow
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import ScaleRect from './helpers'
 
-class Graph extends Component {
-  static propTypes = {
-    width: PropTypes.number,
+type Props = {
+  width: number,
+  height: number,
+}
 
+type State = {
+  isScaling: boolean,
+  tranformM: string,
+  scale: number,
+  coords: {
+    scaleX: number,
+    scaleY: number,
+    width: number,
+    height: number,
+    initialX: number,
+    initialY: number,
+  },
+}
+class Graph extends Component<Props, State> {
+  static defaultProps = {
+    width: 800,
+    height: 300,
   }
+
+  cursorpt: {
+    x: number,
+    y: number,
+  }
+
   constructor(props) {
     super(props)
     this.svgRef = React.createRef()
     this.state = {
       isScaling: false,
-      tranformM: "translate(0 0) scale(1)",
+      tranformM: 'translate(0 0) scale(1)',
       scale: 1,
       coords: {
         scaleX: 1,
@@ -23,23 +48,19 @@ class Graph extends Component {
         initialY: 0,
       },
     }
-    this.svgDimensions = {
-      height: 0,
-      width: 0,
-    }
+
     this.cursorpt = {
       x: 0,
       y: 0,
     }
-    this.lastCursorChangeScalePosition = null
   }
 
   componentDidMount() {
     this.svgpt = this.svgRef.current.createSVGPoint()
-    this.svgDimensions = {
-      height: this.svgRef.current.getBoundingClientRect().height,
-      width: this.svgRef.current.getBoundingClientRect().width,
-    }
+    // this.svgDimensions = {
+    //   height: this.svgRef.current.getBoundingClientRect().height,
+    //   width: this.svgRef.current.getBoundingClientRect().width,
+    // }
   }
 
   _getCoordinates = (evn) => {
@@ -52,12 +73,6 @@ class Graph extends Component {
 
   _mouseDown = (evn) => {
     const cursorpt = this._getCoordinates(evn)
-    // console.log(cursorpt)
-    const { scaleX, scaleY, initialX, initialY } = this.state.coords
-    console.log('cursorpt.x', cursorpt.x)
-    // console.log('initialX', initialX)
-    // console.log(scaleX * initialX)
-    // console.log(cursorpt.x + scaleX * initialX)
     this.setState({
       isScaling: true,
       coords: {
@@ -70,8 +85,8 @@ class Graph extends Component {
 
   _drawRect = (evn) => {
     const cursorpt = this._getCoordinates(evn)
-    const { scaleX, scaleY, initialX, initialY } = this.state.coords
-    const width = (cursorpt.x - initialX) 
+    const { initialX, initialY } = this.state.coords
+    const width = (cursorpt.x - initialX)
     const height = (cursorpt.y - initialY)
     this.setState({
       coords: {
@@ -93,12 +108,13 @@ class Graph extends Component {
           height: 1,
           initialX: 0,
           initialY: 0,
-        }
+        },
       })
     } else {
       const scaleX = 800 / width
       const scaleY = 300 / height
-      const tranformM = `translate(${-scaleX * initialX} ${-scaleY * initialY}) scale(${scaleX} ${scaleY})`
+      const tranformM =
+        `translate(${-scaleX * initialX} ${-scaleY * initialY}) scale(${scaleX} ${scaleY})`
       this.setState({
         tranformM,
         isScaling: false,
@@ -108,21 +124,13 @@ class Graph extends Component {
           scaleY,
           width: 1,
           height: 1,
-          // initialX: 0,
-          // initialY: 0,
-        }
+        },
       })
     }
   }
 
-  getPosition = (evn: MouseEvent) => {
-    this.cursorpt = this._getCoordinates(evn)
-    // console.log(this.cursorpt)
-  }
-
   render() {
-    const { vertical, horizontal, isScaling, coords, tranformM } = this.state
-    // console.log(coords)
+    const { isScaling, coords, tranformM } = this.state
     const step = 5
     return (
       <div style={{ border: '1px solid red', width: 800 }}>
@@ -136,19 +144,18 @@ class Graph extends Component {
           onMouseLeave={isScaling ? this._mouseUp : f => f}
         >
           <g
-            onMouseDown={e => {
-              console.log(e.currentTarget.getAttribute('transform'))
-            }}
             transform={tranformM}
           >
             <rect width="100%" height="100%" fill="transparent" />
-            {isScaling ? <rect
-              x={coords.initialX}
-              y={coords.initialY}
-              width={coords.width}
-              height={coords.height}
-              style={{ stroke: 'blue', fill: 'none', strokeWidth: `${1}` }}
-            /> : null}
+            {isScaling ?
+              <ScaleRect
+                coords={coords}
+                style={{
+                  stroke: 'green',
+                  strokeWidth: 2,
+                }}
+              />
+            : null}
             <path id="lineAB"
               d={`M 10 280
               l ${step} -22 l ${step} 12 l ${step} -18 l ${step} 15
@@ -165,13 +172,6 @@ class Graph extends Component {
               `}
               stroke="red"
               strokeWidth="2" fill="none" />
-            {/* <circle cx="550" cy="250" r="25" style={{ fill: 'purple' }} />
-            <circle cx="450" cy="250" r="25" style={{ fill: 'red' }} />
-            <circle cx="500" cy="50" r="25" style={{ fill: 'orange' }} />
-            <circle cx="500" cy="50" r="2.5" style={{ fill: 'red' }} />
-            <circle cx="350" cy="50" r="25" style={{ fill: 'green' }} />
-            <circle cx="350" cy="50" r="2.5" style={{ fill: 'red' }} />
-            <text style={{ userSelect: 'none' }} x="40" y="130">Abracadabra</text> */}
           </g>
         </svg>
       </div>
