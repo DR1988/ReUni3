@@ -5,6 +5,8 @@ import { LineChart, ReferenceArea, Line, XAxis, YAxis, CartesianGrid, Tooltip, L
 
 import { socketConfig } from '../../../config'
 import Graph from '../../components/common/graphs/Mygraph'
+import { CartesianGrids } from '../../components/common/graphs/Elements/index'
+
 
 function randomIntFromInterval(min, max) // min and max included
 {
@@ -207,17 +209,17 @@ class Graphs extends Component {
         // width={600} height={300} data={rmpValues}
         // margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
-          <XAxis
+          {/* <XAxis
             // scale="ordinal"
             type="number"
             ticks={graphTicks}
             domain={[0, allTime]}
             dataKey="timeStamp"
-          />
-          <YAxis dataKey="RPM set value" hide yAxisId="setValue" />
+          /> */}
+          {/* <YAxis dataKey="RPM set value" hide yAxisId="setValue" /> */}
           <YAxis dataKey="RPM set value" domain={[0, 2000]} yAxisId="currentValue" />
           <CartesianGrid strokeDasharray="3 3" />
-          <Tooltip />
+          {/* <Tooltip />
           <Legend />
           {stepValues && stepValues.map(el =>
             <ReferenceArea
@@ -239,10 +241,14 @@ class Graphs extends Component {
             stroke="red"
             strokeWidth={3}
             yAxisId="currentValue"
-          />
+          /> */}
         </LineChart>
       </ResponsiveContainer >
-      <Graph />
+      <Graph
+        animatable
+      >
+        <CartesianGrids />
+      </Graph>
     </div>)
   }
 }

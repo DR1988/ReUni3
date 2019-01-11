@@ -10,32 +10,40 @@ type Props = {
     initialY: number,
     width: number,
     height: number,
-    scaleX: number,
+    currentScaleX: number,
+    mirrorX: -1 | 1,
+    mirrorY: -1 | 1,
   },
-  style: {
-    stroke: string,
-    strokeWidth: number
-  }
+  strokeWidth: number,
+  stroke: string,
+  fill: string,
 }
 
 
 const ScaleRect = (props: Props) => {
-  const { coords, style } = props
+  const { coords, strokeWidth, stroke, fill } = props
   return (
     <rect
       x={coords.initialX}
       y={coords.initialY}
-      width={coords.width}
+      width={Math.abs(coords.width)}
       height={coords.height}
-      style={{ stroke: style.stroke, fill: 'none', strokeWidth: `${style.strokeWidth / coords.scaleX}` }}
+      style={{
+        pointerEvents: 'none',
+        stroke,
+        fill,
+        strokeWidth: `${strokeWidth / coords.scaleX}`,
+        // transform: `scale(-1, 2)`,
+        transformOrigin: `${coords.initialX}px ${coords.initialY}px`,
+        // transform: 'rotate(32deg)',
+        transform: `scale(${coords.mirrorX}, ${coords.mirrorY})`,
+      }}
     />
   )
 }
 
 ScaleRect.defaultProps = {
-  style: {
-    strokeWidth: 1,
-    stroke: 'blue',
-  },
+  stroke: 'blue',
+  fill: 'none',
 }
 export default ScaleRect

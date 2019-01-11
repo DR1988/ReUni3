@@ -6,6 +6,7 @@ import ScaleRect from './helpers'
 type Props = {
   width: number,
   height: number,
+  animatable: boolean,
 }
 
 type State = {
@@ -19,12 +20,15 @@ type State = {
     height: number,
     initialX: number,
     initialY: number,
+    mirrorX: -1 | 1,
+    mirrorY: -1 | 1,
   },
 }
 class Graph extends Component<Props, State> {
   static defaultProps = {
     width: 800,
     height: 300,
+    animatable: false,
   }
 
   cursorpt: {
@@ -46,6 +50,8 @@ class Graph extends Component<Props, State> {
         height: 1,
         initialX: 0,
         initialY: 0,
+        mirrorX: 1,
+        mirrorY: 1,
       },
     }
 
@@ -71,69 +77,123 @@ class Graph extends Component<Props, State> {
     return cursorpt
   }
 
-  _mouseDown = (evn) => {
-    const cursorpt = this._getCoordinates(evn)
-    this.setState({
-      isScaling: true,
-      coords: {
-        ...this.state.coords,
-        initialX: cursorpt.x,
-        initialY: cursorpt.y,
-      },
-    })
-  }
-
-  _drawRect = (evn) => {
-    const cursorpt = this._getCoordinates(evn)
-    const { initialX, initialY } = this.state.coords
-    const width = (cursorpt.x - initialX)
-    const height = (cursorpt.y - initialY)
-    this.setState({
-      coords: {
-        ...this.state.coords,
-        width: width > 0 ? width : 1,
-        height: height > 0 ? height : 1,
-      },
-    })
-  }
-
-  _mouseUp = () => {
-    const { width, height, initialX, initialY } = this.state.coords
-    if (width <= 1 || height <= 1) {
+  _mouseDown = (evn: SyntheticMouseEvent<T>) => {
+    const event = evn.nativeEvent
+    if (event.which === 1) {
+      const cursorpt = this._getCoordinates(evn)
       this.setState({
-        isScaling: false,
+        isScaling: true,
         coords: {
           ...this.state.coords,
-          width: 1,
-          height: 1,
-          initialX: 0,
-          initialY: 0,
-        },
-      })
-    } else {
-      const scaleX = 800 / width
-      const scaleY = 300 / height
-      const tranformM =
-        `translate(${-scaleX * initialX} ${-scaleY * initialY}) scale(${scaleX} ${scaleY})`
-      this.setState({
-        tranformM,
-        isScaling: false,
-        coords: {
-          ...this.state.coords,
-          scaleX,
-          scaleY,
-          width: 1,
-          height: 1,
+          initialX: cursorpt.x,
+          initialY: cursorpt.y,
         },
       })
     }
   }
 
+  _drawRect = (evn) => {
+    const cursorpt = this._getCoordinates(evn)
+    const { initialX, initialY, scaleX: currentScaleX, scaleY: currentScaleY } = this.state.coords
+    const width = (cursorpt.x - initialX)
+    const height = (cursorpt.y - initialY)
+    const mirrorX = width < 0 ? -1 : 1
+    const mirrorY = height < 0 ? -1 : 1
+
+    let curscaleX = 1 
+    let curscaleY = 1
+    if (mirrorX > 0 && mirrorY > 0) {
+      curscaleX = (800 / width).toFixed(2)
+      curscaleY = (300 / height).toFixed(2)
+      // translateX = mirrorX * -scaleX * initialX
+      // translateY = mirrorY * -scaleY * initialY
+    } else {
+      curscaleX = -(currentScaleX * (width * currentScaleX / 800)).toFixed(2)
+      curscaleY = -(currentScaleY * (height * currentScaleY / 300)).toFixed(2)
+      // console.log('scaleX', scaleX)
+      // translateX = mirrorX * (800 - initialX * currentScaleX) / scaleX
+      // translateY = 300 - initialY
+    }
+
+    this.setState({
+      curscaleX,
+      curscaleY,
+      coords: {
+        ...this.state.coords,
+        width: mirrorX * width,
+        height: mirrorY * height,
+        mirrorX,
+        mirrorY,
+      },
+    })
+  }
+
+  _mouseUp = () => {
+    const {
+      width,
+      height,
+      initialX,
+      initialY,
+      mirrorX,
+      mirrorY,
+      scaleX: currentScaleX,
+      scaleY: currentScaleY,
+    } = this.state.coords
+    let scaleX = 1
+    let scaleY = 1
+    let translateX = 0
+    let translateY = 0
+    if (mirrorX > 0 && mirrorY > 0) {
+      scaleX = 800 / width
+      scaleY = 300 / height
+      translateX = mirrorX * -scaleX * initialX
+      translateY = mirrorY * -scaleY * initialY
+    } else {
+      scaleX = currentScaleX * (width * currentScaleX / 800)
+      scaleY = currentScaleY * (height * currentScaleY / 300)
+      console.log(800 - initialX, currentScaleX)
+      // translateX = mirrorX * (800 - initialX * currentScaleX) / scaleX
+      // translateY = mirrorY * (300 - initialY * currentScaleY) / scaleY
+      translateX = mirrorX * (initialX - 400)
+      translateY = mirrorY * (initialY - 150 )
+
+    }
+    if (scaleX < 1) {
+      scaleX = 1
+      translateX = 0
+    }
+    if (scaleY < 1) {
+      scaleY = 1
+      translateY = 0
+    }
+    // scaleX = mirrorX > 0 ? 800 / width : currentScaleX * (width * currentScaleX / 800)
+    // scaleY = mirrorY > 0 ? 300 / height : currentScaleY * (height * currentScaleY / 300)
+    // console.log(scaleX, width, width * currentScaleX, width * currentScaleX / 800)
+    // console.log(translateX)
+    const tranformM =
+      `translate(${translateX} ${translateY}) scale(${scaleX} ${scaleY})`
+    this.setState({
+      tranformM,
+      isScaling: false,
+      coords: {
+        ...this.state.coords,
+        scaleX,
+        scaleY,
+        width: 1,
+        height: 1,
+      },
+    })
+    // }
+  }
+
   render() {
-    const { isScaling, coords, tranformM } = this.state
+    const { isScaling, coords, tranformM, curscaleX, curscaleY } = this.state
     const step = 5
+    const { children, animatable } = this.props
     return (
       <div style={{ border: '1px solid red', width: 800 }}>
+        <h1 style={{ position: 'absolute', top: '340px' }}>scaleX:{curscaleX}</h1>
+        <h1 style={{ position: 'absolute', top: '370px' }}>scaleY:{curscaleY}</h1>
         <svg
           style={{ display: 'block' }}
           width="100%" height="300" ref={this.svgRef}
@@ -144,18 +204,18 @@ class Graph extends Component<Props, State> {
           onMouseLeave={isScaling ? this._mouseUp : f => f}
         >
           <g
+            style={{ transition: animatable ? 'transform 1s' : '' }}
             transform={tranformM}
           >
             <rect width="100%" height="100%" fill="transparent" />
+            {children}
             {isScaling ?
               <ScaleRect
                 coords={coords}
-                style={{
-                  stroke: 'green',
-                  strokeWidth: 2,
-                }}
+                strokeWidth={2}
+                stroke="green"
               />
-            : null}
+              : null}
             <path id="lineAB"
               d={`M 10 280
               l ${step} -22 l ${step} 12 l ${step} -18 l ${step} 15
@@ -169,6 +229,33 @@ class Graph extends Component<Props, State> {
               l ${step} -12 l ${step} 8 l ${step} -14 l ${step} 18
               l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
               l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -13 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -13 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -220 l ${step} 210 l ${step} -10 l ${step} 15
+              l ${step} -12 l ${step} 8 l ${step} -14 l ${step} 18
+              l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -13 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -13 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -220 l ${step} 210 l ${step} -10 l ${step} 15
+              l ${step} -12 l ${step} 8 l ${step} -14 l ${step} 18
+              l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -22 l ${step} 12 l ${step} -18 l ${step} 15
+              l ${step} -13 l ${step} 11 l ${step} -10 l ${step} 22
+              l ${step} -13 l ${step} 11 l ${step} -10 l ${step} 22
+              l ${step} -22 l ${step} 12 l ${step} -18 l ${step} 15
+              l ${step} -13 l ${step} 11 l ${step} -10 l ${step} 22
+              l ${step} -13 l ${step} 11 l ${step} -10 l ${step} 22
+              l ${step} -13 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -22 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -13 l ${step} 11 l ${step} -10 l ${step} 15
+              l ${step} -220 l ${step} 210 l ${step} -10 l ${step} 15
               `}
               stroke="red"
               strokeWidth="2" fill="none" />
