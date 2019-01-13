@@ -44,6 +44,7 @@ class Graph extends Component<Props, State> {
       tranformM: 'translate(0 0) scale(1)',
       scale: 1,
       coords: {
+        scale: 1,
         scaleX: 1,
         scaleY: 1,
         width: 1,
@@ -100,7 +101,7 @@ class Graph extends Component<Props, State> {
     const mirrorX = width < 0 ? -1 : 1
     const mirrorY = height < 0 ? -1 : 1
 
-    let curscaleX = 1 
+    let curscaleX = 1
     let curscaleY = 1
     if (mirrorX > 0 && mirrorY > 0) {
       curscaleX = (800 / width).toFixed(2)
@@ -155,7 +156,7 @@ class Graph extends Component<Props, State> {
       // translateX = mirrorX * (800 - initialX * currentScaleX) / scaleX
       // translateY = mirrorY * (300 - initialY * currentScaleY) / scaleY
       translateX = mirrorX * (initialX - 400)
-      translateY = mirrorY * (initialY - 150 )
+      translateY = mirrorY * (initialY - 150)
 
     }
     if (scaleX < 1) {
@@ -186,6 +187,61 @@ class Graph extends Component<Props, State> {
     // }
   }
 
+  _onwheel = (e: MouseEvent) => {
+    // console.log(e.deltaY)
+    const cursorpt = this._getCoordinates(e)
+    const { coords } = this.state
+    console.log(cursorpt)
+    const resize = e.deltaY / 100
+    let scale = coords.scale - resize * 0.1
+    // let scaleY = coords.scaleY - resize * 0.1
+    // console.log(scaleX)
+    // if (scaleX > 4) scaleX = 4
+    // if (scaleY > 4) scaleY = 4
+    // if (scaleX < 1) scaleX = 1
+    // if (scaleY < 1) scaleY = 1
+    let initialX
+    let initialY
+    if (scale > 4 || scale < 1) {
+      if (scale < 1) scale = 1
+      if (scale > 4) scale = 4
+      initialX = coords.initialX
+      initialY = coords.initialY
+    } else {
+      initialX = coords.initialX + cursorpt.x * resize * 0.1
+      initialY = coords.initialY + cursorpt.y * resize * 0.1
+    }
+    const tranformM =
+      `translate(${initialX} ${initialY}) scale(${scale} ${scale})`
+    this.setState({
+      tranformM,
+      coords: {
+        ...coords,
+        scale,
+        initialX,
+        initialY,
+        // scaleX,
+        // scaleY,
+      },
+    })
+    // } else {
+    //   let scaleX = coords.scaleX * 0.9
+    //   let scaleY = coords.scaleY * 0.9
+    //   if (scaleX < 1) scaleX = 1
+    //   if (scaleY < 1) scaleY = 1
+    //   const tranformM =
+    //   `translate(${coords.initialX} ${coords.initialX}) scale(${scaleX} ${scaleY})`
+    //   this.setState({
+    //     tranformM,
+    //     coords: {
+    //       ...coords,
+    //       scaleX,
+    //       scaleY,
+    //     },
+    //   })
+    // }
+  }
+
   render() {
     const { isScaling, coords, tranformM, curscaleX, curscaleY } = this.state
     const step = 5
@@ -198,14 +254,16 @@ class Graph extends Component<Props, State> {
           style={{ display: 'block' }}
           width="100%" height="300" ref={this.svgRef}
           viewBox="0 0 800 300"
-          onMouseDown={this._mouseDown}
-          onMouseUp={isScaling ? this._mouseUp : f => f}
-          onMouseMove={isScaling ? this._drawRect : f => f}
-          onMouseLeave={isScaling ? this._mouseUp : f => f}
+          onWheel={this._onwheel}
+        // onMouseDown={this._mouseDown}
+        // onMouseUp={isScaling ? this._mouseUp : f => f}
+        // onMouseMove={isScaling ? this._drawRect : f => f}
+        // onMouseLeave={isScaling ? this._mouseUp : f => f}
         >
           <g
             style={{ transition: animatable ? 'transform 1s' : '' }}
             transform={tranformM}
+          // transform={`translate(${coords.initialX * coords.initialX} ${coords.initialY * coords.initialY}) scale(${coords.scaleX} ${coords.scaleY})`}
           >
             <rect width="100%" height="100%" fill="transparent" />
             {children}
