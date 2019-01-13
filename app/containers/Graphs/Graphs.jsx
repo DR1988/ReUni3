@@ -245,7 +245,9 @@ class Graphs extends Component {
         </LineChart>
       </ResponsiveContainer >
       <Graph
-        animatable
+        // animatable
+        scaleFactor={0.2}
+        maxScale={10}
       >
         <CartesianGrids />
       </Graph>

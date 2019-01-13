@@ -7,6 +7,8 @@ type Props = {
   width: number,
   height: number,
   animatable: boolean,
+  scaleFactor: number,
+  maxScale: number,
 }
 
 type State = {
@@ -29,6 +31,8 @@ class Graph extends Component<Props, State> {
     width: 800,
     height: 300,
     animatable: false,
+    scaleFactor: 0.1,
+    maxScale: 3,
   }
 
   cursorpt: {
@@ -191,25 +195,21 @@ class Graph extends Component<Props, State> {
     // console.log(e.deltaY)
     const cursorpt = this._getCoordinates(e)
     const { coords } = this.state
-    console.log(cursorpt)
-    const resize = e.deltaY / 100
-    let scale = coords.scale - resize * 0.1
-    // let scaleY = coords.scaleY - resize * 0.1
+    const { scaleFactor, maxScale } = this.props
+    const resize = e.deltaY < 0 ? -1 : 1
+    let scale = (coords.scale - resize * scaleFactor).toFixed(2)
+    // let scaleY = coords.scaleY - resize * scaleFactor
     // console.log(scaleX)
-    // if (scaleX > 4) scaleX = 4
-    // if (scaleY > 4) scaleY = 4
-    // if (scaleX < 1) scaleX = 1
-    // if (scaleY < 1) scaleY = 1
     let initialX
     let initialY
-    if (scale > 4 || scale < 1) {
+    if (scale > maxScale || scale < 1) {
       if (scale < 1) scale = 1
-      if (scale > 4) scale = 4
+      if (scale > maxScale) scale = maxScale
       initialX = coords.initialX
       initialY = coords.initialY
     } else {
-      initialX = coords.initialX + cursorpt.x * resize * 0.1
-      initialY = coords.initialY + cursorpt.y * resize * 0.1
+      initialX = coords.initialX + cursorpt.x * resize * scaleFactor
+      initialY = coords.initialY + cursorpt.y * resize * scaleFactor
     }
     const tranformM =
       `translate(${initialX} ${initialY}) scale(${scale} ${scale})`
